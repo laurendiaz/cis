@@ -24,7 +24,8 @@ def rotProdMatVec(rotMatrix, vect):
 
 # Product of frame and vector
 def frameVecProd(frame, vect):
-    return 0
+    return np.matmul(frame.get_rot(), vect) + frame.get_vec
+
 '''
 # Cross product of two vectors - np.matmul
 def crossProd(vec1, vec2):
