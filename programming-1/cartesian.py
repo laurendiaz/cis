@@ -1,5 +1,14 @@
 # Create a library of essential functions for 3D point manipulation and Cartesian transformations
 import numpy as np
+import os
+
+# Read input file
+def ReadInputFile(filename):
+    fileDir = os.path.dirname(os.path.realpath('__file__'))
+    file = open(abs_file_path)
+    size = os.path.getsize(file)
+
+    return size, data
 
 # Define identity matrix
 '''
