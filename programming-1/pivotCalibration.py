@@ -3,35 +3,38 @@
 # Outputs two 3x1 vectors ptip and ppivot
 
 import numpy as np
+from numpy import scipy
 
 def pivotCalibration(j=None, J=None):
     N_frames = J.shape[3 - 1]
-    ## Find the transformation for N frames
-    # R is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix in a frame
-    # p is a 3XN_frames 2D matrix, each column corresponds to the
-    # translation in a frame
-    R = np.zeros((3, 3, N_frames))
-    p = np.zeros((3, N_frames))
+    ''''
+    Calculate transformation for N frames
+    R is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix in a frame
+    p is a 3XN_frames 2D matrix, each column corresponds to the translation in a frame
+    '''
+    R = np.zeros(3, 3, N_frames)
+    p = np.zeros(3, N_frames)
     for i in np.arange(1, N_frames + 1).reshape(-1):
-        R_i, p_i = registration(j, J(:,:, i))
+        R_i, p_i = registration(j, J[:,:, i]) #apply registration function
         R[:, :, i] = R_i
         p[:, i] = p_i
 
-    ## Costructing functions for least squares
-    # The least square function needs to be solved:
-    # [Ri|-I]*[p_tip;p_pivot] = [-pi]
-
-    # Build LHS matrix [Ri|-I] and RHS [-pi] for all frames
-    LHS = []
-    RHS = []
+    '''
+    Costructing functions for least squares
+    The least square function needs to be solved:
+    [Ri|-I]*[ptip;ppivot] = [-pi]
+    '''
+    # Build Left matrix [Ri|-I] and Right [-pi] for all frames
+    Left = []
+    Right = []
     for i in np.arange(1, N_frames + 1).reshape(-1):
-        LHS = np.array([[LHS], [R(:,:, i), - np.eye(3)]])
-        RHS = np.array([[RHS], [- p(:, i)]])
+        Left = np.array([[Left], [R[:,:,i], - np.eye(3)]])
+        Right = np.array([[Right], [- p[:, i]]])
+        Left.shape
+        Right.shape
 
-        LHS.shape
-        RHS.shape
-        ## Solving least squares
-        x, resnorm, residual, exitflag, output, lambda_ = leastSquareSolver(LHS, RHS)
+        # Solving least squares
+        x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(Left, Right)
         # MAKE LEAST SQUARES SOLVER
         print(resnorm)
         ptip = x(np.arange(1, 3 + 1))
