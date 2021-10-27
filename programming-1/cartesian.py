@@ -3,12 +3,12 @@ import numpy as np
 import os
 
 # Read input file
-def ReadInputFile(filename):
-    fileDir = os.path.dirname(os.path.realpath('__file__'))
-    file = open(abs_file_path)
-    size = os.path.getsize(file)
-
-    return size, data
+def readInputFile(filename):
+    os.chdir("inputs")
+    file = open(filename)
+    data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+    os.chdir("..")
+    return data
 
 # Define identity matrix
 '''
