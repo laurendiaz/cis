@@ -6,9 +6,14 @@ import os
 def readInputFile(filename):
     os.chdir("inputs")
     file = open(filename)
+    # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+    # Get size
+    f = open(filename, "r").readline()  # Read the first line from file
+    size = f.split(',')[:3]  # extract the first three values
+    size = list(map(int, size))  # Convert list to Array of int
     os.chdir("..")
-    return data
+    return data, size
 
 # Define identity matrix
 '''
