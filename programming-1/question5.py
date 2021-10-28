@@ -19,17 +19,18 @@ for i in np.arange(1, N_frames + 1).reshape(-1):
     G[:, :, i] = emPivotData(np.arange(ind, ind + N_G))
     ind = ind + N_G
 
-# Part A: Define local probe coordinate system and compute g_i using the first frame
+# Part A: Define local probe coordinate system and compute g_j using the first frame
 # Compute Midpoint
-G1 = G[:, :, 1]
-G_0 = np.mean(G1, 1)
+Gj = G[:, :, 1]
+G_0 = np.mean(Gj, 1)
 
-# Observations relative to the midpoint
+# Translate the observations relative to the midpoint
 g = np.zeros((N_G, 3))
 for i in np.arange(1, N_G + 1).reshape(-1):
-    g[i, :] = G1[i, :] - G_0
+    g[i, :] = Gj[i, :] - G_0
 
 # Part B and C: Implement Pivot Calibration
-t_G, p_dimple = pivotCalibration(g, G)
+t_G, P_dimple = pivotCalibration(g, G)
+
 # For export to output.txt file
-q5_exp = p_dimple
+q5_exp = P_dimple
