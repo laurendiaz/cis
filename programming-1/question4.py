@@ -38,7 +38,7 @@ for i in np.arange(1, N_framescal).reshape(-1):
     C[:, :, i] = calReadData[np.arange(ind, ind + N_C), :]
     ind = ind + N_C
 
-# Part 1: Calculate F_D = [R_D, p_D]
+# Part A: Calculate F_D = [R_D, p_D]
 # R_D is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
 # p_D is a 3XN_frames 2D matrix, each column corresponds to the translation of a frame
 R_D = np.zeros((3, 3, N_framescal))
@@ -48,7 +48,7 @@ for i in np.arange(1, N_framescal + 1).reshape(-1):
     R_D[:, :, i] = R_i
     p_D[:, i] = p_i
 
-# Part 2: Calculate F_A = [R_A, p_A]
+# Part B: Calculate F_A = [R_A, p_A]
 # R_A is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
 # p_A is a 3XN_frames 2D matrix, each column corresponds to the translation of a frame
 R_A = np.zeros((3, 3, N_framescal))
@@ -58,13 +58,13 @@ for i in np.arange(1, N_framescal + 1).reshape(-1):
     R_A[:, :, i] = R_i
     p_A[:, i] = p_i
 
-# Part 3: Calculate C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
+# Part C: Compute C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
 C_exp = np.zeros((N_C, 3, N_framescal))
 for i in np.arange(1, N_framescal + 1).reshape(-1):
     for j in np.arange(1, N_C + 1).reshape(-1):
         C_exp[j, :, i] = np.transpose((frameInv(R_D[:, :, i]) * (R_A[:, :, i] * np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i])))
 
-# Part 4: Output file
+# Part D: Output C_i expected
 # Reshaping C_exp
 C_final = []
 for i in np.arange(1, N_framescal + 1).reshape(-1):

@@ -24,12 +24,12 @@ for i in np.arange(1, N_frames + 1).reshape(-1):
 G1 = G[:, :, 1]
 G_0 = np.mean(G1, 1)
 
-# Translate the observations relative to the midpoint
+# Observations relative to the midpoint
 g = np.zeros((N_G, 3))
 for i in np.arange(1, N_G + 1).reshape(-1):
     g[i, :] = G1[i, :] - G_0
 
-# Part B&C: Implement Pivot Calibration
+# Part B and C: Implement Pivot Calibration
 t_G, p_dimple = pivotCalibration(g, G)
 # For export to output.txt file
 q5_exp = p_dimple
