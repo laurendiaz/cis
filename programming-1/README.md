@@ -1,4 +1,5 @@
 # CIS Programming Assignment 1
+by Russell Chow and Lauren Diaz
 ### cartesian.py
 Used in conjunction with numpy and scipy libraries for needs pertaining to Cartesian math. A simple Frame data structure was written with getters and setters and functions were developed to manipulate this data structure for our purposes.
 
@@ -29,4 +30,4 @@ Functions:
 ### pivotCalibration.py
 ### question4.py
 ### question5.py
-by Russell Chow and Lauren Diaz
+
