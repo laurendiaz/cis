@@ -4,6 +4,8 @@
 
 import numpy as np
 from numpy import scipy
+from icp import *
+
 
 def pivotCalibration(j=None, J=None):
     N_frames = J.shape[3 - 1]
@@ -15,7 +17,7 @@ def pivotCalibration(j=None, J=None):
     R = np.zeros(3, 3, N_frames)
     p = np.zeros(3, N_frames)
     for i in np.arange(1, N_frames + 1).reshape(-1):
-        R_i, p_i = registration(j, J[:,:, i]) #apply registration function
+        R_i, p_i = ICP(j, J[:, :, i])  # apply ICP registration
         R[:, :, i] = R_i
         p[:, i] = p_i
 
@@ -28,15 +30,14 @@ def pivotCalibration(j=None, J=None):
     Left = []
     Right = []
     for i in np.arange(1, N_frames + 1).reshape(-1):
-        Left = np.array([[Left], [R[:,:,i], - np.eye(3)]])
+        Left = np.array([[Left], [R[:, :, i], - np.eye(3)]])
         Right = np.array([[Right], [- p[:, i]]])
 
-    Left.shape
-    Right.shape
+    # Left.shape
+    # Right.shape
 
     # Solving least squares
     x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(Left, Right)
-    # MAKE LEAST SQUARES SOLVER
     print(resnorm)
     ptip = x(np.arange(1, 3 + 1))
     ppivot = x(np.arange(4, 6 + 1))
