@@ -14,7 +14,7 @@ def FindClosestPoint(fq, bnd, T):
             - d: distance; || ck - Fn dot qk ||
     '''
     d, i = T.query(x=fq, k=1, distance_upper_bound=bnd)
-    return T.self.data[i], i, d
+    return T.data[i], i, d
 
 def FindBestRigidTransformation(A, B):
     '''
@@ -44,7 +44,8 @@ def FindBestRigidTransformation(A, B):
             X = np.array([x])
             begin = False
         else:
-            np.append(X, x)
+            xarr = np.array([x])
+            X = np.concatenate((X, xarr), axis=0)
     
     begin = True
     for i in B:
@@ -53,20 +54,21 @@ def FindBestRigidTransformation(A, B):
             Y = np.array([y])
             begin = False
         else:
-            np.append(Y, y)
+            yarr = np.array([y])
+            Y = np.concatenate((Y, yarr), axis=0)
 
     # compute d x d covariance matrix S = XWY^T
-    W = np.ones(X.shape[1])
-    xw = np.dot(X, W)
-    t = np.transpose(Y)
-    S = np.dot(xw, t)
+    # X and Y should be dxn where n is length of given arrays and d is
+    W = np.eye(A.shape[1])
+    S = np.dot(np.dot(X, W), np.transpose(Y))
 
     # compute the svd (gives rotation)
     u,s,vh = np.linalg.svd(S) #A = USV^H
 
-    ye = np.eye(Y.shape[1])
-    ye[Y.shape[1] - 1] = np.linalg.det(np.dot(np.transpose(vh), np.transpose(u)))
+    ye = np.eye(vh.shape[0])
+    ye[-1][-1] = np.linalg.det(np.dot(np.transpose(vh), np.transpose(u)))
     R = np.dot(np.transpose(vh), ye)
+
     R = np.dot(R, np.transpose(vh))
 
     # compute optimal translation as t = q - Rp
@@ -117,8 +119,8 @@ def ICP(M, Q, F0, eta0):
     n = 0
     I = np.empty(1) #
     C = np.empty(1) #
-    D = 0 
-    E = 0
+    D = np.empty(1) 
+    E = np.empty(1)
 
     F = F0
 
@@ -129,8 +131,8 @@ def ICP(M, Q, F0, eta0):
     eta = eta0
 
     ''' step 1 - matching '''
-    A = 0 
-    B = 0
+    A = np.empty(1)
+    B = np.empty(1)
     
     
     terminate = False
@@ -157,23 +159,23 @@ def ICP(M, Q, F0, eta0):
                 I = np.array([i])
                 D = np.array([d])
             else:
-                np.append(C, c)
-                np.append(I, i)
-                np.append(D, d)
+                C = np.concatenate((C, [c]), axis=0)
+                I = np.concatenate((I, [i]), axis=0)
+                D = np.concatenate((D, [d]), axis=0)
 
             if d < eta:
                 if(k == 0):
-                    A = np.array(Q[k])
-                    B = np.array(C[k])
+                    A = np.array([Q[k]])
+                    B = np.array([C[k]])
                 else:
-                    np.append(A, Q[k])
-                    np.append(B, C[k])
+                    A = np.concatenate((A, [Q[k]]), axis=0)
+                    B = np.concatenate((B, [C[k]]), axis=0)
 
                 # Ek - residual errors bk - F dot ak
                 if k == 0:
                     E = np.array(C[k] - cart.frameVecProd(F, Q[k]))
                 else:
-                    np.append(E, C[k] - cart.frameVecProd(F, Q[k]))
+                    E = np.concatenate((E, C[k] - cart.frameVecProd(F, Q[k])), axis=0)
                 
             k += 1
 
@@ -185,33 +187,38 @@ def ICP(M, Q, F0, eta0):
 
         ekdotsum = 0
         count = 0
-        while count < E.shape[1]:
+        while count < E.shape[0]:
             e = np.dot(E[count], E[count])
             ekdotsum += np.dot(E[count], E[count])
             if count == 0:
-                Edot = np.array(math.sqrt([e]))
+                Edot = np.array([math.sqrt(e)])
             else:
-                np.append(Edot, math.sqrt(e))
+                earr = np.array([math.sqrt(e)])
+                Edot = np.concatenate((Edot, earr), axis=0)
             
             count += 1
 
         # sigma =  (sqrt (sum (ek dot ek)))/ numelements(E)
-        sigma = math.sqrt(ekdotsum) / Edot.shape[1]
+        sigma = math.sqrt(ekdotsum) / Edot.shape[0]
 
         # epsilonmax = max(sqrt(ek dot ek))
         epsilonmax = np.amax(Edot)
 
         # epsilon = (sum(sqrt(ek dot ek)))/numelmenets(E)
-        epsilon = np.sum(Edot) / Edot.shape[1]
+        epsilon = np.sum(Edot) / Edot.shape[0]
 
         if n == 0:
             Sigma = np.array([sigma])
             Epsilonmax = np.array([epsilonmax])
             Epsilon = np.array([epsilon])
         else:
-            np.append(Sigma, sigma)
-            np.append(Epsilonmax, epsilonmax)
-            np.append(Epsilon, epsilon)
+            sigarr = np.array([sigma])
+            epsmaxarr = np.array([epsilonmax])
+            epsarr = np.array([epsilon])
+
+            Sigma = np.concatenate((Sigma, sigarr), axis=0)
+            Epsilonmax = np.concatenate((Epsilonmax, epsmaxarr), axis=0)
+            Epsilon = np.concatenate((Epsilon, epsarr), axis=0)
 
         ''' step 3 - adjustment '''
         # compute etan from {eta0, ..., etan-1}
