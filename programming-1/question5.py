@@ -14,9 +14,9 @@ N_frames = emPivotData(2)
 # Position of markers with respect to the sensor
 G = np.zeros((N_G, 3, N_frames))
 
-ind = 1
+ind = 0
 for i in np.arange(1, N_frames + 1).reshape(-1):
-    G[:, :, i] = emPivotData(np.arange(ind, ind + N_G - 1 + 1))
+    G[:, :, i] = emPivotData(np.arange(ind, ind + N_G))
     ind = ind + N_G
 
 # Part A: Define local probe coordinate system and compute g_i using the first frame

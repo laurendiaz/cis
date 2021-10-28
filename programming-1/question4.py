@@ -62,16 +62,15 @@ for i in np.arange(1, N_framescal + 1).reshape(-1):
 C_exp = np.zeros((N_C, 3, N_framescal))
 for i in np.arange(1, N_framescal + 1).reshape(-1):
     for j in np.arange(1, N_C + 1).reshape(-1):
-        C_exp[j, :, i] = np.transpose(
-            (np.linalg.inv(R_D[:, :, i]) * (R_A[:, :, i] * np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i])))
+        C_exp[j, :, i] = np.transpose((frameInv(R_D[:, :, i]) * (R_A[:, :, i] * np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i])))
 
 # Part 4: Output file
 # Reshaping C_exp
-C_fin = []
+C_final = []
 for i in np.arange(1, N_framescal + 1).reshape(-1):
-    C_fin = np.array([[C_fin], [C_exp[:, :, i]]])
+    C_final = np.array([[C_final], [C_exp[:, :, i]]])
 
 # Export to output.txt file
-q4_exp = np.transpose(C_fin)
+q4_exp = np.transpose(C_final)
 
 

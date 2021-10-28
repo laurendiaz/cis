@@ -7,7 +7,7 @@ from numpy import scipy
 from icp import *
 
 
-def pivotCalibration(j=None, J=None):
+def pivotCalibration(j, J):
     N_frames = J.shape[3 - 1]
     ''''
     Calculate transformation for N frames
