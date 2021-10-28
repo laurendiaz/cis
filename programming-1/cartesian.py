@@ -52,7 +52,7 @@ def readInput_OptPivot(filename):
     return data, size
 
 def readOutput(filename):
-    os.chdir("inputs")
+    os.chdir("outputs")
     file = open(filename)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
