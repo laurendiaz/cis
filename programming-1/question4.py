@@ -20,9 +20,13 @@ N_C = calBodySize[2]
 N_framescal = calReadSize[3]
 
 # Position of markers with respect to the calibration body
-d = calBodyData[np.arange(N_D + 1, 1), :]
+d = calBodyData[np.arange(1, N_D + 1), :]
+d = d.astype(float)
 a = calBodyData[np.arange(N_D + 1, N_A + N_D + 1), :]
+a = a.astype(float)
 c = calBodyData[np.arange(N_D + N_A + 1, len(calBodyData) - 1), :]
+c = c.astype(float)
+
 
 # Position of markers with respect to the trackers
 D = np.zeros((N_D, 3, N_framescal))
