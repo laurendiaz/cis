@@ -52,44 +52,13 @@ def readInput_OptPivot(filename):
     return data, size
 
 
-# Define identity matrix
-'''
-def identity(mat):
-    i = np.identity(mat.size)
-    return i
 
-
-# Define rotation matrix - not sure what this is for?
-def rotation():
-    '''
-
-# Rotation angle and rotation from rotation matrix - not sure how to do this?
-def angleAndRotation(rotMatrix):
-    return 0
-
-'''
-# Product of rotation matrix and vector - use np.matmul
-def rotProdMatVec(rotMatrix, vect):
-    return 0
-'''
 
 # Product of frame and vector
 def frameVecProd(frame, vect):
     return np.matmul(frame.get_rot(), vect) + frame.get_vec
 
-'''
-# Cross product of two vectors - np.matmul
-def crossProd(vec1, vec2):
-    return 0
 
-# Dot product of two vectors - np.vdot
-def dotProd(vec1, vec2):
-    return vdot(vec1, vec2)
-
-# Inverse of rotation matrix - np.inv
-def rotInv(rotMatrix):
-    return 0
-'''
 # Inverse of frame
 def frameInv(frame):
     '''
@@ -100,11 +69,6 @@ def frameInv(frame):
     inv = Frame(rot, vec)
     return inv
 
-'''
-# Product of two rotation matrices - np.matmul
-def rotProdMatMat(rot1, rot2):
-    return 0
-'''
 
 # Product of two frames
 def frameProd(frame1, frame2):
@@ -116,11 +80,6 @@ def frameProd(frame1, frame2):
     prod = Frame(rot, inv)
     return prod
 
-'''
-# Least squares solver - scipy
-def leastSq():
-    return 0
-'''
 
 class Frame:
     def __init__(self, rot, vec):
