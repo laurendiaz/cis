@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # Read input file
-def readInputFile(filename):
+def readInput_Body(filename):
     os.chdir("inputs")
     file = open(filename)
     # Get data
@@ -14,6 +14,43 @@ def readInputFile(filename):
     size = list(map(int, size))  # Convert list to Array of int
     os.chdir("..")
     return data, size
+
+def readInput_Readings(filename):
+    os.chdir("inputs")
+    file = open(filename)
+    # Get data
+    data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+    # Get size
+    f = open(filename, "r").readline()  # Read the first line from file
+    size = f.split(',')[:4]  # extract the first three values
+    size = list(map(int, size))  # Convert list to Array of int
+    os.chdir("..")
+    return data, size
+
+def readInput_EmPivot(filename):
+    os.chdir("inputs")
+    file = open(filename)
+    # Get data
+    data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+    # Get size
+    f = open(filename, "r").readline()  # Read the first line from file
+    size = f.split(',')[:2]  # extract the first three values
+    size = list(map(int, size))  # Convert list to Array of int
+    os.chdir("..")
+    return data, size
+
+def readInput_OptPivot(filename):
+    os.chdir("inputs")
+    file = open(filename)
+    # Get data
+    data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+    # Get size
+    f = open(filename, "r").readline()  # Read the first line from file
+    size = f.split(',')[:3]  # extract the first three values
+    size = list(map(int, size))  # Convert list to Array of int
+    os.chdir("..")
+    return data, size
+
 
 # Define identity matrix
 '''
