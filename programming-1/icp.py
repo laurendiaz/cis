@@ -144,8 +144,8 @@ def ICP(M, Q, F0, eta0):
             e = 0
 
             if k == 0:
-                #pick the distance to any point in the other cloud
-                bnd = np.linalg.norm(Q[0] - M[0], 1) # i think this is right? double check me
+                # pick the distance to any point in the other cloud
+                bnd = np.linalg.norm(Q[0] - M[0], 1)  # i think this is right? double check me
             else:
                 bnd = np.linalg.norm(C[k - 1] - cart.frameVecProd(F, Q[k - 1]), 1)
             # develop first w simple search, later make more sophisticated using T
