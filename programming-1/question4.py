@@ -9,7 +9,7 @@ from icp import *
 print('Enter the name of your input data file (e.g. pa1-debug-a): ')
 filename = input()
 F0BodyData, F0BodySize = readOutput(filename + '-output1.txt')
-eta0 = 0.95
+eta0 = 1000
 
 # Get data from the input files
 calBodyData, calBodySize = readInput_Body(filename + '-calbody.txt')
