@@ -14,15 +14,14 @@ def pivotCalibration(j, J):
     R is a 3x3xN_frames 3D matrix, each page corresponding to the rotation matrix of the frame
     p is a 3XN_frames 2D matrix, each column corresponding to the translation of the frame
     '''
-    R = np.zeros(3, 3, N_frames)
-    p = np.zeros(3, N_frames)
+    R = np.zeros((3, 3, N_frames))
+    p = np.zeros((3, N_frames))
     for i in np.arange(1, N_frames + 1).reshape(-1):
-        R_i, p_i = ICP(j, J[:, :, i])  # apply ICP registration
+        R_i, p_i = ICP(j, J[:, :, i], F0, eta0)  # apply ICP registration
         R[:, :, i] = R_i
         p[:, i] = p_i
 
     '''
-    Costructing functions for least squares
     The least square function needs to be solved:
     [Ri|-I]*[ptip;ppivot] = [-pi]
     '''

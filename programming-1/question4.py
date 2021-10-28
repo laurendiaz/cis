@@ -8,7 +8,7 @@ from icp import *
 # Get user input for file name:
 print('Enter the name of your input data file (e.g. pa1-debug-a): ')
 filename = input()
-F0BodyData, F0BodySize = readOutput(filename + '-output1.txt')
+F0 = Frame(45, [1, 1, 1])
 eta0 = 1000
 
 # Get data from the input files
@@ -44,7 +44,7 @@ for i in np.arange(1, N_framescal).reshape(-1):
 R_D = np.zeros((3, 3, N_framescal))
 p_D = np.zeros((3, N_framescal))
 for i in np.arange(1, N_framescal + 1).reshape(-1):
-    R_i, p_i = ICP(d, D[:, :, i], F0BodyData, eta0)
+    R_i, p_i = ICP(d, D[:, :, i], F0, eta0)
     R_D[:, :, i] = R_i
     p_D[:, i] = p_i
 
@@ -54,7 +54,7 @@ for i in np.arange(1, N_framescal + 1).reshape(-1):
 R_A = np.zeros((3, 3, N_framescal))
 p_A = np.zeros((3, N_framescal))
 for i in np.arange(1, N_framescal + 1).reshape(-1):
-    R_i, p_i = ICP(a, A[:, :, i], F0BodyData, eta0)
+    R_i, p_i = ICP(a, A[:, :, i], F0, eta0)
     R_A[:, :, i] = R_i
     p_A[:, i] = p_i
 

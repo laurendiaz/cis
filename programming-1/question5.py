@@ -11,7 +11,7 @@ emPivotData, emPivotSize = readInput_EmPivot(filename + '-empivot.txt')
 N_G = emPivotSize[0]
 N_frames = emPivotSize[1]
 
-F0BodyData, F0BodySize = readOutput(filename + '-output1.txt')
+F0 = Frame(45, [1, 1, 1])
 eta0 = 1000
 
 # Position of markers with respect to the sensor
