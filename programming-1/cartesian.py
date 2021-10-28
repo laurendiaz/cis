@@ -51,6 +51,17 @@ def readInput_OptPivot(filename):
     os.chdir("..")
     return data, size
 
+def readOutput(filename):
+    os.chdir("inputs")
+    file = open(filename)
+    # Get data
+    data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+    # Get size
+    f = open(filename, "r").readline()  # Read the first line from file
+    size = f.split(',')[:2]  # extract the first three values
+    size = list(map(int, size))  # Convert list to Array of int
+    os.chdir("..")
+    return data, size
 
 # Define identity matrix
 '''
