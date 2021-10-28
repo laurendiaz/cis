@@ -8,15 +8,18 @@ from pivotCalibration import *
 # Get data from the input files
 filename = input()
 emPivotData, emPivotSize = readInput_EmPivot(filename + '-empivot.txt')
-N_G = emPivotSize(1)
-N_frames = emPivotData(2)
+N_G = emPivotSize[0]
+N_frames = emPivotSize[1]
+
+F0BodyData, F0BodySize = readOutput(filename + '-output1.txt')
+eta0 = 1000
 
 # Position of markers with respect to the sensor
 G = np.zeros((N_G, 3, N_frames))
 
 ind = 0
-for i in np.arange(1, N_frames + 1).reshape(-1):
-    G[:, :, i] = emPivotData(np.arange(ind, ind + N_G))
+for i in np.arange(1, N_frames).reshape(-1):
+    G[:, :, i] = emPivotData[np.arange(ind, ind + N_G)]
     ind = ind + N_G
 
 # Part A: Define local probe coordinate system and compute g_j using the first frame
@@ -26,8 +29,8 @@ G_0 = np.mean(Gj, 1)
 
 # Translate the observations relative to the midpoint
 g = np.zeros((N_G, 3))
-for i in np.arange(1, N_G + 1).reshape(-1):
-    g[i, :] = Gj[i, :] - G_0
+for i in np.arange(1, N_G).reshape(-1):
+    g[i, :] = Gj[i, :] - G_0[i]
 
 # Part B and C: Implement Pivot Calibration
 t_G, P_dimple = pivotCalibration(g, G)
