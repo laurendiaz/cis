@@ -1,5 +1,4 @@
-# Computer Integrated Surgery I - F21
-## Programming Assignment 1
+# CIS Programming Assignment 1
 ### cartesian.py
 Used in conjunction with numpy and scipy libraries for needs pertaining to Cartesian math. A simple Frame data structure was written with getters and setters and functions were developed to manipulate this data structure for our purposes.
 
