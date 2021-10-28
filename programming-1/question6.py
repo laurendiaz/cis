@@ -6,6 +6,8 @@ import numpy as np
 from cartesian import *
 from icp import *
 from pivotCalibration import *
+import question4
+import question5
 
 filename = input()
 calBodyData, calBodySize = readInput_Body(filename + '-calbody.txt')
@@ -41,8 +43,7 @@ P = np.zeros((N_H, 3, N_frames))
 
 for i in np.arange(1, N_frames + 1).reshape(-1):
     for j in np.arange(1, N_H + 1).reshape(-1):
-        P[j, :, i] = np.transpose(
-            (np.linalg.solve(R_D[:, :, i], (np.transpose(H[j, :, i]))) - np.linalg.solve(R_D[:, :, i], p_D[:, i])))
+        P[j, :, i] = np.transpose((np.linalg.solve(R_D[:, :, i], (np.transpose(H[j, :, i]))) - np.linalg.solve(R_D[:, :, i], p_D[:, i])))
 
 # Define local probe coordinate system and compute p_i using the first frame
 P1 = P[:, :, 1]
@@ -53,15 +54,15 @@ p = np.zeros((N_H, 3))
 for i in np.arange(1, N_H + 1).reshape(-1):
     p[i, :] = P1[i, :] - P_0
 
-# Implement Pivot Calibration
+# Implement pivot calibration
 t_P, p_dimple = pivotCalibration(p, P)
 q6_exp = p_dimple
 
 # Creating output file to export to output folder
-outname = (filename + '-output-1.txt')
-outpath = ('Output/' + outname)
-fileID = open(outpath, 'w')
-fileID.write("{}, {}, {}\n".format(N_C, N_framescal, outname))
+filenameout = (filename + '-output-1.txt')
+filepathout = ('Output/' + filenameout)
+fileID = open(filepathout, 'w')
+fileID.write("{}, {}, {}\n".format(N_C, N_framescal, filenameout))
 fileID.write("{}, {}\n".format(q5_exp, q6_exp))
 fileID.write("{}\n".format(q4_exp))
 fileID.close()
