@@ -16,6 +16,7 @@ def FindClosestPoint(fq, bnd, T):
     d, i = T.query(x=fq, k=1, distance_upper_bound=bnd)
     return T.data[i], i, d
 
+
 def FindBestRigidTransformation(A, B):
     '''
     Method Based Off "Least Squares Rigid Motion Using SVD
@@ -46,7 +47,7 @@ def FindBestRigidTransformation(A, B):
         else:
             xarr = np.array([x])
             X = np.concatenate((X, xarr), axis=0)
-    
+
     begin = True
     for i in B:
         y = i - b
@@ -63,7 +64,7 @@ def FindBestRigidTransformation(A, B):
     S = np.dot(np.dot(X, W), np.transpose(Y))
 
     # compute the svd (gives rotation)
-    u,s,vh = np.linalg.svd(S) #A = USV^H
+    u, s, vh = np.linalg.svd(S)  # A = USV^H
 
     ye = np.eye(vh.shape[0])
     ye[-1][-1] = np.linalg.det(np.dot(np.transpose(vh), np.transpose(u)))
@@ -77,6 +78,7 @@ def FindBestRigidTransformation(A, B):
     F = cart.Frame(R, t)
     return F
 
+
 def TerminationTest(Sigma, Epsilonmax, Epsilon):
     '''
     Given: - Sigma: array of sigma values
@@ -85,9 +87,10 @@ def TerminationTest(Sigma, Epsilonmax, Epsilon):
     Return: - False (so that iterations continue) if within proper bounds
             - Otherwise, True (to end iterations)
     '''
-    if 0.95 <= Epsilon[-1] <= 1 and Sigma >=0 and Epsilonmax >= 0:
+    if 0.95 <= Epsilon[-1] <= 1 and Sigma >= 0 and Epsilonmax >= 0:
         return False
     return True
+
 
 '''
 Iterative Closest Point registration algorithm
@@ -100,6 +103,8 @@ Return: - c: closest point on M to Q; np.array
         - i: indices of triangles mik corresponding to c
         - d: distance; || ck - Fn dot qk ||
 '''
+
+
 def ICP(M, Q, F0, eta0):
     '''
     Temporary Variables: 
@@ -117,9 +122,9 @@ def ICP(M, Q, F0, eta0):
     ''' step 0 - initialization '''
     T = KDTree(M)
     n = 0
-    I = np.empty(1) #
-    C = np.empty(1) #
-    D = np.empty(1) 
+    I = np.empty(1)  #
+    C = np.empty(1)  #
+    D = np.empty(1)
     E = np.empty(1)
 
     F = F0
@@ -133,8 +138,7 @@ def ICP(M, Q, F0, eta0):
     ''' step 1 - matching '''
     A = np.empty(1)
     B = np.empty(1)
-    
-    
+
     terminate = False
     while terminate == False:
         k = 0
@@ -147,13 +151,14 @@ def ICP(M, Q, F0, eta0):
 
             if k == 0:
                 # pick the distance to any point in the other cloud
+                M[0] = np.array(list(map(np.float, M[0])))
                 bnd = np.linalg.norm(Q[0] - M[0], 1)  # i think this is right? double check me
             else:
                 bnd = np.linalg.norm(C[k - 1] - cart.frameVecProd(F, Q[k - 1]), 1)
             # develop first w simple search, later make more sophisticated using T
 
-            [c, i, d] = FindClosestPoint(cart.frameVecProd(F, Q[k - 1]), bnd, T) 
-            
+            [c, i, d] = FindClosestPoint(cart.frameVecProd(F, Q[k - 1]), bnd, T)
+
             if k == 0:
                 C = np.array([c])
                 I = np.array([i])
@@ -164,7 +169,7 @@ def ICP(M, Q, F0, eta0):
                 D = np.concatenate((D, [d]), axis=0)
 
             if d < eta:
-                if(k == 0):
+                if (k == 0):
                     A = np.array([Q[k]])
                     B = np.array([C[k]])
                 else:
@@ -176,13 +181,13 @@ def ICP(M, Q, F0, eta0):
                     E = np.array(C[k] - cart.frameVecProd(F, Q[k]))
                 else:
                     E = np.concatenate((E, C[k] - cart.frameVecProd(F, Q[k])), axis=0)
-                
+
             k += 1
 
         ''' step 2 - transformation update '''
         n += 1
         F = FindBestRigidTransformation(A, B)
-        
+
         Edot = np.empty(1)
 
         ekdotsum = 0
@@ -195,7 +200,7 @@ def ICP(M, Q, F0, eta0):
             else:
                 earr = np.array([math.sqrt(e)])
                 Edot = np.concatenate((Edot, earr), axis=0)
-            
+
             count += 1
 
         # sigma =  (sqrt (sum (ek dot ek)))/ numelements(E)
@@ -233,7 +238,7 @@ def ICP(M, Q, F0, eta0):
         # if the num valid matches begins to fall significantly one
         # can increase it adaptively. too tight a bound may encourage
         # false minima
-        if (3 * epsilon) > (eta/5):
+        if (3 * epsilon) > (eta / 5):
             neweta = -(eta + epsilon)
         eta -= neweta
         np.append(Eta, eta)
@@ -250,14 +255,3 @@ def ICP(M, Q, F0, eta0):
 
         n += 1
     return F
-        
-        
-
-
-
-
-
-
-
-
-

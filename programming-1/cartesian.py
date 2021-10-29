@@ -4,7 +4,8 @@ import os
 
 # Read input file
 def readInput_Body(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
@@ -15,7 +16,8 @@ def readInput_Body(filename):
     return data, size
 
 def readInput_Readings(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
@@ -26,7 +28,8 @@ def readInput_Readings(filename):
     return data, size
 
 def readInput_EmPivot(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
@@ -37,7 +40,8 @@ def readInput_EmPivot(filename):
     return data, size
 
 def readInput_OptPivot(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
+    #sfname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)

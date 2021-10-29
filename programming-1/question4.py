@@ -52,9 +52,8 @@ for i in np.arange(1, N_framescal).reshape(-1):
 # p_D is a 3XN_frames 2D matrix, each column corresponds to the translation of a frame
 R_D = np.zeros((3, 3, N_framescal))
 p_D = np.zeros((3, N_framescal))
-for i in np.arange(1, N_framescal + 1).reshape(-1):
-    F = ICP(d, D[:, :, i], F0, eta0) 
-    
+for i in np.arange(0, N_framescal + 1).reshape(-1):
+    F = ICP(d, D[:, :, i], F0, eta0)
     R_i = F.get_rot()
     p_i = F.get_vec()
     R_D[:, :, i] = R_i
