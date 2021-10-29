@@ -4,8 +4,8 @@ import os
 
 # Read input file
 def readInput_Body(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
-    #fname = os.getcwd() + "/inputs/" + filename
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
@@ -16,8 +16,8 @@ def readInput_Body(filename):
     return data, size
 
 def readInput_Readings(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
-    #fname = os.getcwd() + "/inputs/" + filename
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
@@ -28,8 +28,8 @@ def readInput_Readings(filename):
     return data, size
 
 def readInput_EmPivot(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
-    #fname = os.getcwd() + "/inputs/" + filename
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
@@ -40,8 +40,8 @@ def readInput_EmPivot(filename):
     return data, size
 
 def readInput_OptPivot(filename):
-    fname = os.getcwd() + "/programming-1/inputs/" + filename
-    #fname = os.getcwd() + "/inputs/" + filename
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
     file = open(fname)
     # Get data
     data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
@@ -62,7 +62,7 @@ def frameInv(frame):
     '''
         F^-1 = [R^-1, R^-1 dot p]
     '''
-    rot = np.inv(frame.get_rot()) # is this correct way to ge
+    rot = np.linalg.inv(frame.get_rot()) # is this correct way to ge
     vec = np.dot(rot, frame.get_vec())
     inv = Frame(rot, vec)
     return inv

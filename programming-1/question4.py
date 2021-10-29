@@ -32,7 +32,6 @@ a = a.astype(float)
 c = calBodyData[np.arange(N_D + N_A + 1, len(calBodyData) - 1), :]
 c = c.astype(float)
 
-
 # Position of markers with respect to the trackers
 D = np.zeros((N_D, 3, N_framescal))
 A = np.zeros((N_A, 3, N_framescal))
@@ -51,27 +50,27 @@ for i in np.arange(1, N_framescal).reshape(-1):
 # R_D is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
 # p_D is a 3XN_frames 2D matrix, each column corresponds to the translation of a frame
 R_D = np.zeros((3, 3, N_framescal))
-p_D = np.zeros((3, N_framescal))
-for i in np.arange(0, N_framescal + 1).reshape(-1):
+p_D = np.zeros((3, 3, N_framescal))
+for i in np.arange(0, N_framescal):
     F = ICP(d, D[:, :, i], F0, eta0)
     R_i = F.get_rot()
     p_i = F.get_vec()
     R_D[:, :, i] = R_i
     print(p_D.shape)
     print(p_i.shape)
-    p_D[:, i] = p_i
+    p_D[:, :, i] = p_i
 
 # Part B: Calculate F_A = [R_A, p_A]
 # R_A is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
 # p_A is a 3XN_frames 2D matrix, each column corresponds to the translation of a frame
 R_A = np.zeros((3, 3, N_framescal))
-p_A = np.zeros((3, N_framescal))
-for i in np.arange(1, N_framescal + 1).reshape(-1):
+p_A = np.zeros((3, 3, N_framescal))
+for i in np.arange(0, N_framescal):
     F = ICP(a, A[:, :, i], F0, eta0)
     R_i = F.get_rot()
     p_i = F.get_vec()
     R_A[:, :, i] = R_i
-    p_A[:, i] = p_i
+    p_A[:, :, i] = p_i
 
 # Part C: Compute C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
 C_exp = np.zeros((N_C, 3, N_framescal))
