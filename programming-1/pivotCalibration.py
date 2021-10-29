@@ -3,8 +3,9 @@
 # Outputs two 3x1 vectors ptip and ppivot
 
 import numpy as np
-from numpy import scipy
+import scipy
 from icp import *
+import cartesian
 
 
 def pivotCalibration(j, J):
@@ -14,10 +15,18 @@ def pivotCalibration(j, J):
     R is a 3x3xN_frames 3D matrix, each page corresponding to the rotation matrix of the frame
     p is a 3XN_frames 2D matrix, each column corresponding to the translation of the frame
     '''
+    theta = 45
+    r = np.array([[1, 0, 0],
+                [0, math.cos(theta), -math.sin(theta)],
+                [0, math.sin(theta), math.cos(theta)]])
+    F0 = cartesian.Frame(r, [1, 1, 1])
+    eta0 = 1000000000000000
     R = np.zeros((3, 3, N_frames))
     p = np.zeros((3, N_frames))
     for i in np.arange(1, N_frames + 1).reshape(-1):
-        R_i, p_i = ICP(j, J[:, :, i], F0, eta0)  # apply ICP registration
+        F = ICP(j, J[:, :, i], F0, eta0)  # apply ICP registration
+        R_i = F.get_rot()
+        p_i = F.get_vec()
         R[:, :, i] = R_i
         p[:, i] = p_i
 
