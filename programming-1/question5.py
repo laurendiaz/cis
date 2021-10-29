@@ -18,7 +18,7 @@ eta0 = 1000
 G = np.zeros((N_G, 3, N_frames))
 
 ind = 0
-for i in np.arange(1, N_frames).reshape(-1):
+for i in np.arange(0, N_frames):
     G[:, :, i] = emPivotData[np.arange(ind, ind + N_G)]
     ind = ind + N_G
 
@@ -29,7 +29,7 @@ G_0 = np.mean(Gj, 1)
 
 # Translate the observations relative to the midpoint
 g = np.zeros((N_G, 3))
-for i in np.arange(1, N_G).reshape(-1):
+for i in np.arange(0, N_G):
     g[i, :] = Gj[i, :] - G_0[i]
 
 # Part B and C: Implement Pivot Calibration
