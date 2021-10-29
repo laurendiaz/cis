@@ -57,6 +57,8 @@ for i in np.arange(0, N_framescal + 1).reshape(-1):
     R_i = F.get_rot()
     p_i = F.get_vec()
     R_D[:, :, i] = R_i
+    print(p_D.shape)
+    print(p_i.shape)
     p_D[:, i] = p_i
 
 # Part B: Calculate F_A = [R_A, p_A]

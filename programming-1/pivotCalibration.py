@@ -46,7 +46,7 @@ def pivotCalibration(j, J):
 
     # Solving least squares
     x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(Left, Right)
-    print(resnorm)
+    #print(resnorm)
     ptip = x(np.arange(1, 3 + 1))
     ppivot = x(np.arange(4, 6 + 1))
 

@@ -2,6 +2,7 @@ from scipy.spatial import KDTree
 import numpy as np
 import math
 import cartesian as cart
+from collections.abc import Iterable
 
 
 def FindClosestPoint(fq, bnd, T):
@@ -14,7 +15,9 @@ def FindClosestPoint(fq, bnd, T):
             - d: distance; || ck - Fn dot qk ||
     '''
     d, i = T.query(x=fq, k=1, distance_upper_bound=bnd)
-    return T.data[i], i, d
+    if(isinstance(d, Iterable)):
+        d = d[0]
+    return T.data[i - 1], i, d
 
 
 def FindBestRigidTransformation(A, B):
@@ -87,7 +90,7 @@ def TerminationTest(Sigma, Epsilonmax, Epsilon):
     Return: - False (so that iterations continue) if within proper bounds
             - Otherwise, True (to end iterations)
     '''
-    if 0.95 <= Epsilon[-1] <= 1 and Sigma >= 0 and Epsilonmax >= 0:
+    if 0.95 <= Epsilon[-1] <= 1 and Sigma[-1] >= 0 and Epsilonmax[-1] >= 0:
         return False
     return True
 
@@ -168,6 +171,8 @@ def ICP(M, Q, F0, eta0):
                 I = np.concatenate((I, [i]), axis=0)
                 D = np.concatenate((D, [d]), axis=0)
 
+            #print(d)
+            #print(eta)
             if d < eta:
                 if (k == 0):
                     A = np.array([Q[k]])
