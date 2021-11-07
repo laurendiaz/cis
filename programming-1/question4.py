@@ -1,9 +1,9 @@
 # Question 4
 # Solve for distorted calibration
 
-import numpy as np
-from cartesian import *
-from icp import *
+import numpy as np 
+import cartesian
+import icp
 import math
 
 # Get user input for file name:
@@ -13,12 +13,12 @@ theta = 45
 R = np.array([[1, 0, 0],
             [0, math.cos(45), -math.sin(45)],
             [0, math.sin(45), math.cos(45)]])
-F0 = Frame(R, [1, 1, 1])
+F0 = cartesian.Frame(R, [1, 1, 1])
 eta0 = 1000000000000000
 
 # Get data from the input files
-calBodyData, calBodySize = readInput_Body(filename + '-calbody.txt')
-calReadData, calReadSize = readInput_Readings(filename + '-calreadings.txt')
+calBodyData, calBodySize = cartesian.readInput_Body(filename + '-calbody.txt')
+calReadData, calReadSize = cartesian.readInput_Readings(filename + '-calreadings.txt')
 N_D = calBodySize[0]
 N_A = calBodySize[1]
 N_C = calBodySize[2]
@@ -52,7 +52,7 @@ for i in np.arange(1, N_framescal).reshape(-1):
 R_D = np.zeros((3, 3, N_framescal))
 p_D = np.zeros((3, N_framescal))
 for i in np.arange(0, N_framescal):
-    F = ICP(d, D[:, :, i], F0, eta0)
+    F = icp.ICP(d, D[:, :, i], F0, eta0)
     R_i = F.get_rot()
     p_i = F.get_vec()
     R_D[:, :, i] = R_i
@@ -66,7 +66,7 @@ for i in np.arange(0, N_framescal):
 R_A = np.zeros((3, 3, N_framescal))
 p_A = np.zeros((3, N_framescal))
 for i in np.arange(0, N_framescal):
-    F = ICP(a, A[:, :, i], F0, eta0)
+    F = icp.ICP(a, A[:, :, i], F0, eta0)
     R_i = F.get_rot()
     p_i = F.get_vec()
     R_A[:, :, i] = R_i

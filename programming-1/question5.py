@@ -2,16 +2,16 @@
 # Pivot calibration
 
 import numpy as np
-from cartesian import *
-from pivotCalibration import *
+import cartesian
+import pivotCalibration
 
 # Get data from the input files
 filename = input()
-emPivotData, emPivotSize = readInput_EmPivot(filename + '-empivot.txt')
+emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
 N_G = emPivotSize[0]
 N_frames = emPivotSize[1]
 
-F0 = Frame(45, [1, 1, 1])
+F0 = cartesian.Frame(45, [1, 1, 1])
 eta0 = 1000
 
 # Position of markers with respect to the sensor
@@ -33,7 +33,7 @@ for i in np.arange(0, N_G):
     g[i, :] = Gj[i, :] - G_0[i]
 
 # Part B and C: Implement Pivot Calibration
-t_G, P_dimple = pivotCalibration(g, G)
+t_G, P_dimple = pivotCalibration.pivotCalibration(g, G)
 
 # For export to output.txt file
 q5_exp = P_dimple
