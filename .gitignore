@@ -130,3 +130,10 @@ dmypy.json
 
 #custom
 .idea
+.idea/.gitignore
+.idea/cis.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/other.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
