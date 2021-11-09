@@ -2,7 +2,7 @@
 by Russell Chow and Lauren Diaz
 
 ### cartesian.py
-Used in conjunction with numpy and scipy libraries for needs pertaining to Cartesian math. A simple Frame data structure was written with getters and setters and functions were developed to manipulate this data structure for our purposes.
+Used in conjunction with numpy and scipy libraries for needs pertaining to Cartesian math including a simple Frame data structure was written with getters and setters and functions were developed to manipulate this data structure for our purposes.
 
 Functions:
 - readInput_
@@ -27,10 +27,10 @@ Functions:
 - ICP (main registration method)
 
 ### pivotCalibration.py
-Function that Computes position of the tool tip and the calibration post for pivot calibration.
+Function that computes position of the tool tip and the calibration post for pivot calibration.
 
 ### pa2.py
-Main script that runs processes all parts of PA2.
+Main script that runs the processes for part 1 through 6 of PA2.
 
 Functions:
 - ScaleToBox
