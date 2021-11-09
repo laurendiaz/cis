@@ -75,6 +75,18 @@ def readInput_EmFiducialss(filename):
     size = list(map(int, size))  # Convert list to Array of int
     return data, size
 
+def readInput_EmNav(filename):
+    #fname = os.getcwd() + "/programming-1/inputs/" + filename
+    fname = os.getcwd() + "/inputs/" + filename
+    file = open(fname)
+    # Get data
+    data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+    # Get size
+    f = open(fname, "r").readline()  # Read the first line from file
+    size = f.split(',')[:2]  # extract the two values
+    size = list(map(int, size))  # Convert list to Array of int
+    return data, size
+
 # Product of frame and vector
 def frameVecProd(frame, vect):
     dotprod = np.dot(frame.get_rot(), vect)
