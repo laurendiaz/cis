@@ -186,7 +186,9 @@ def main():
     B = np.zeros((N_B, 3))
 
     for i in np.arange(0, N_B):
-        R_i, p_i = icp.ICP(g, G[:, :, i], F0, eta0)
+        F = icp.ICP(g, G[:, :, i], F0, eta0)
+        R_i = F.get_rot()
+        p_i = F.get_vec()
         R_ptr[:, :, i] = R_i
         p_ptr[:, i] = p_i
         B[i, :] = np.transpose(R_i * p_tip + p_i)
