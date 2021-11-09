@@ -113,7 +113,7 @@ def main():
 
     # Part 2: Distortion Correction (See function)
 
-    # Part 3: EM pivot calibration using distortion correction to find b_j
+    # Part 3: EM pivot calibration using distortion correction
     emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
     N_G = emPivotSize[0]
     N_framesEM = emPivotSize[1]
@@ -121,14 +121,14 @@ def main():
     # Find position of markers relative to sensor
     G = np.zeros((N_G, 3, N_framesEM))
     ind = 0
-    for i in np.arange(0, N_framesEM)
+    for i in np.arange(0, N_framesEM):
         G[:, :, i] = emPivotData[np.arange(ind, ind + N_G), :]
         ind = ind + N_G
 
     # Use distortion correction
     G_correct = np.zeros((N_G, 3, N_framesEM))
-    for i in np.arange(0, N_framesEM)
-        for j in np.arange(0, N_G)
+    for i in np.arange(0, N_framesEM):
+        for j in np.arange(0, N_G):
             G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
 
     # Define and use probe coordinate system to find g
@@ -136,17 +136,47 @@ def main():
     G_mid = np.mean(G2,1)
 
     g = np.zeros(N_G, 3)
-    for i in np.arange(N_G, 3)
+    for i in np.arange(N_G, 3):
         g[i, :] = G2[i, :] - G_mid
 
     # Pivot calibration using distortion correction
     p_tip, p_dimple = pivotCalibration.pivotCalibration(g, G_correct)
 
-    # Part 4: Compute F_reg
+    # Part 4: Using the distortion correction and the improved pivot value, compute b_j, the locations of the
+    # fiducials points with respect to the EM tracker base coordinate system
+    emFiducialsData, emFiducialsSize = cartesian.readInput_EmFiducialss(filename + '-em-fiducialss.txt')
+    N_G = emFiducialsSize[0]
+    N_B = emFiducialsSize[1]
 
-    # Part 5: Apply distortion correction to G[n]
+    # Find position of markers relative to sensor for N_B fiducials
+    G = np.zeros((N_G, 3, N_B))
+    ind = 0
+    for i in np.arange(0, N_B):
+        G[:, :, i] = emFiducialsData[np.arange(ind, ind + N_G), :]
+        ind = ind + N_G
 
-    # Part 6: Compute pointer tip coordinates wrt tracker base
+    # Use distortion correction with fiducial data
+    G_correct = np.zeros((N_G, 3, N_framesEM))
+    for i in np.arange(0, N_framesEM):
+        for j in np.arange(0, N_G):
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
+
+    # Compute b_j of fiducials using new p_tip
+    R_ptr = np.zeros((3, 3, N_B))
+    p_ptr = np.zeros((3, N_B))
+    B = np.zeros((N_B, 3))
+
+    for i in np.arange(0, N_B):
+        R_i, p_i = icp.ICP(g, G[:, :, i], F0, eta0)
+        R_ptr[:, :, i] = R_i
+        p_ptr[:, i] = p_i
+        B[i, :] = np.transpose(R_i * p_tip + p_i)
+
+    # Part 5: Compute F_reg
+
+    # Part 6: Apply distortion correction to G[n]
+
+    # Compute pointer tip coordinates wrt tracker base
 
     # Apply F_reg to compute tip location wrt CT image
 
