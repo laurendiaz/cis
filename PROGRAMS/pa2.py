@@ -106,7 +106,7 @@ def main():
     C = np.zeros((N_C, 3, N_framescal))
 
     ind = 0
-    for i in np.arange(1, N_framescal).reshape(-1):
+    for i in np.arange(1, N_framescal):
         D[:, :, i] = calReadData[np.arange(ind, ind + N_D), :]
         ind = ind + N_D
         A[:, :, i] = calReadData[np.arange(ind, ind + N_A), :]

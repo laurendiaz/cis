@@ -57,7 +57,7 @@ def FindBestRigidTransformation(A, B):
     R = vh * u
 
     if np.linalg.det(R) < 0:
-        vh[2,:] *= -1 # fix if neg
+        vh[2, :] *= -1 # fix if neg
         R = vh.T * u.T
 
     # compute optimal translation 
