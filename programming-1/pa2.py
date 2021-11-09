@@ -22,13 +22,15 @@ given some pointer data frames, you will report corresponding CT coordinates.
         respect to the CT image.
 '''
 
-
+# Scales q
 def ScaleToBox(q, qmin, qmax):
     return (q - qmin) / (qmax - qmin)
 
+# Returns Bernstein basis polynomials
 def Bernie(a, b):
     return scipy.special.comb(5, b) * (a ** b) * ((1 - a) ** (5 - b))
 
+# Returns "tensor forms" of interpolation polynomials
 def Tensor(v):
     f = np.zeros((1, 216))
     ind = 0
@@ -161,11 +163,7 @@ def main():
     for i in np.arange(0, N_C*N_framescal):
         for j in np.arange(0, 2):
             v[i, j] = ScaleToBox(emMeasure[i, j], lower, upper)
-        f = Tensor(v[i, :])
-
-    mat = np.zeros((1, 3))
-    for i in np.arange(start=1, stop=3, step=1):
-        mat[i] = ScaleToBox(p[i], lower, upper)
+        f = Tensor(v[:, i])
 
     # Coefficient from distance using least squares
     coefficient = np.zeros((216, 3))
