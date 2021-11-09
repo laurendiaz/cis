@@ -22,13 +22,16 @@ given some pointer data frames, you will report corresponding CT coordinates.
         respect to the CT image.
 '''
 
+
 def ScaleToBox(q, qmin, qmax):
-    return (q - qmin)/(qmax-qmin)
+    return (q - qmin) / (qmax - qmin)
+
 
 def Bernie(a, b):
-    return scipy.special.comb(5, b) * (a**b) * ((1 - a)**(5 - b))
+    return scipy.special.comb(5, b) * (a ** b) * ((1 - a) ** (5 - b))
 
-def distortionCorrection(p,q):
+
+def distortionCorrection(p, q):
     '''
         Compute distortion correction function for a distorted
         3D Navigational Sensor
@@ -38,26 +41,28 @@ def distortionCorrection(p,q):
                - q = coeff from dist calibration
     '''
     # 1) determine bounding box to scale q_i values 
-        # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
+    # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
     upper = 10000
     lower = 0
 
     mat = np.zeros(1, 3)
     for i in np.arange(start=1, stop=3, step=1):
-        mat[i] = ScaleToBox(p[i], lower, upper) 
+        mat[i] = ScaleToBox(p[i], lower, upper)
+
     # 2) set up and solve least squares problem:
-        # [F_000(u_s) ... F_555(u_s)] [[c_000^x, c_000^y, c_000^z][... ... ...][c_555^x, c_555^y, c_555^z]] = [p_s^x, p_s^y, p_s^z]
-    vectCorr = np.zeros(1,3)
+    # [F_000(u_s) ... F_555(u_s)] [[c_000^x, c_000^y, c_000^z][... ... ...][c_555^x, c_555^y, c_555^z]] = [p_s^x, p_s^y, p_s^z]
+    vectCorr = np.zeros(1, 3)
     count = 0
     for i in np.arange(1, 5, 1):
         for j in np.arange(1, 5, 1):
             for k in np.arange(1, 5, 1):
-                c_ijk = q[count,:]
+                c_ijk = q[count, :]
                 five = Bernie(vectCorr[0], i) * Bernie(vectCorr[1], j) * Bernie(vectCorr[2], k)
                 vectCorr = vectCorr + (c_ijk * five)
                 count += 1
-    #return Sigma Sigma Sigma c_i,j,k B_5,i(u_x) B_5,j(u_y) B_5,k(u_z)
+    # return Sigma Sigma Sigma c_i,j,k B_5,i(u_x) B_5,j(u_y) B_5,k(u_z)
     return vectCorr
+
 
 def main():
     # Part 1: Process data the values of C_i^expected [k] corresponding to each C_i [k] in each “frame” k of data.
@@ -128,7 +133,8 @@ def main():
     C_i = np.zeros((N_C, 3, N_framescal))
     for i in np.arange(0, N_framescal):
         for j in np.arange(0, N_C):
-            C_i[j, :, i] = np.transpose(R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
+            C_i[j, :, i] = np.transpose(
+                R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
     # Part 2: Distortion Correction (See function)
 
@@ -152,7 +158,7 @@ def main():
 
     # Define and use probe coordinate system to find g
     G2 = G_correct[:, :, 1]
-    G_mid = np.mean(G2,1)
+    G_mid = np.mean(G2, 1)
 
     g = np.zeros(N_G, 3)
     for i in np.arange(N_G, 3):
@@ -239,8 +245,9 @@ def main():
     outpath = 'outputs/' + outname
     fileID = open(outpath, 'w')
     fileID.write('%3d, %s\n' % N_framesEM, outname)
-    fileID.write('%d, %d, %d\n' %b_j[0], b_j[1], b_j[2])
+    fileID.write('%d, %d, %d\n' % b_j[0], b_j[1], b_j[2])
 
     return 0
+
 
 main()
