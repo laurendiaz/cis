@@ -4,8 +4,9 @@
 
 import numpy as np
 import scipy
-from icp import *
+from icp import ICP
 import cartesian
+import math
 
 
 def pivotCalibration(j, J):
