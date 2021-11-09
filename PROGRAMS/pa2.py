@@ -141,20 +141,18 @@ def main():
         p_A[:, i] = p_i
 
     # Compute C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
-    C_i = np.zeros((N_C, 3, N_framescal))
+    C_i = []
     for i in np.arange(0, N_framescal):
         for j in np.arange(0, N_C):
-            C_i[j, :, i] = np.transpose(
-                R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
+            C_i[j, :, i] = np.transpose(R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
     # Part 2: Distortion Calibration
     # Create "ground truth" and EM measurements
     truth = []
     emMeasure = []
     for i in np.arange(0, N_framescal):
-        for j in np.arange(0, N_C):
-            truth = np.array(C_i[j, :, i], dtype=object)
-            emMeasure = np.array(C[j, :, i], dtype=object)
+        truth = np.array([[truth], C_i[:, :, i]], dtype=object)
+        emMeasure = np.array([[emMeasure], C[:, :, i]], dtype=object)
 
     qmax = 1000
     qmin = 0

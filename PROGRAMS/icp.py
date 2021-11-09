@@ -193,8 +193,8 @@ def ICP(M, Q, F0, eta0):
                     A = np.array([Q[k]])
                     B = np.array([C[k]])
                 else:
-                    A = np.concatenate((A, [Q[k]]), axis=0)
-                    B = np.concatenate((B, [C[k]]), axis=0)
+                    A = np.c_[A, [Q[k]]]
+                    B = np.c_[B, [C[k]]]
 
                 # Ek - residual errors bk - F dot ak
                 if k == 0:
