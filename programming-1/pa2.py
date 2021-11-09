@@ -1,4 +1,8 @@
-import cartesian 
+import cartesian
+import numpy as np
+import icp
+import math
+import pivotCalibration
 
 '''
 In this assignment, you will fit polynomials to model distortion and then use these polynomials to “dewarp” 
@@ -37,23 +41,103 @@ def distortionCorrection(p,q):
     return 0
 
 def main():
-    # input body calibration data file 
+    # Part 1: Process data the values of C_i^expected [k] corresponding to each C_i [k] in each “frame” k of data.
     print('Enter the name of your input data file (e.g. pa2-debug-a): ')
     filename = input()
     calBodyData, calBodySize = cartesian.readInput_Body(filename + '-calbody.txt')
     calReadData, calReadSize = cartesian.readInput_Readings(filename + '-calreadings.txt')
+    R = np.array([[1, 0, 0],
+                  [0, math.cos(45), -math.sin(45)],
+                  [0, math.sin(45), math.cos(45)]])
+    F0 = cartesian.Frame(R, [1, 1, 1])
+    eta0 = 1000000000000000
 
-    # process data the values of C_i^expected [k] corresponding to each C_i [k] in each “frame” k of data.
+    N_D = calBodySize[0]
+    N_A = calBodySize[1]
+    N_C = calBodySize[2]
+    N_framescal = calReadSize[3]
 
-    # Use distortion correction as pivot calibration for EM probe
+    # Position of markers with respect to the calibration body
+    d = calBodyData[np.arange(1, N_D + 1), :]
+    d = d.astype(float)
+    a = calBodyData[np.arange(N_D + 1, N_A + N_D + 1), :]
+    a = a.astype(float)
+    c = calBodyData[np.arange(N_D + N_A + 1, len(calBodyData) - 1), :]
+    c = c.astype(float)
 
-    # Use distortion correction and new pivot value to find b_j wrt EM tracker base coordinate system
+    # Position of markers with respect to the trackers
+    D = np.zeros((N_D, 3, N_framescal))
+    A = np.zeros((N_A, 3, N_framescal))
+    C = np.zeros((N_C, 3, N_framescal))
 
-    # Compute F_reg
+    ind = 0
+    for i in np.arange(1, N_framescal).reshape(-1):
+        D[:, :, i] = calReadData[np.arange(ind, ind + N_D), :]
+        ind = ind + N_D
+        A[:, :, i] = calReadData[np.arange(ind, ind + N_A), :]
+        ind = ind + N_A
+        C[:, :, i] = calReadData[np.arange(ind, ind + N_C), :]
+        ind = ind + N_C
 
-    # Apply distortion correction to G[n]
+    # Calculate F_D = [R_D, p_D]
+    # R_D is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
+    # p_D is a 3XN_frames 2D matrix, each column corresponds to the translation of a frame
+    R_D = np.zeros((3, 3, N_framescal))
+    p_D = np.zeros((3, N_framescal))
+    for i in np.arange(0, N_framescal):
+        F = icp.ICP(d, D[:, :, i], F0, eta0)
+        R_i = F.get_rot()
+        p_i = F.get_vec()
+        R_D[:, :, i] = R_i
+        print(p_D.shape)
+        print(p_i.shape)
+        p_D[:, i] = p_i[:, 1]
 
-    # Compute pointer tip coordinates wrt tracker base
+    # Calculate F_A = [R_A, p_A]
+    # R_A is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
+    # p_A is a 3XN_frames 2D matrix, each column corresponds to the translation of a frame
+    R_A = np.zeros((3, 3, N_framescal))
+    p_A = np.zeros((3, N_framescal))
+    for i in np.arange(0, N_framescal):
+        F = icp.ICP(a, A[:, :, i], F0, eta0)
+        R_i = F.get_rot()
+        p_i = F.get_vec()
+        R_A[:, :, i] = R_i
+        p_A[:, i] = p_i[:, 1]
+
+    # Compute C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
+    C_exp = np.zeros((N_C, 3, N_framescal))
+    for i in np.arange(0, N_framescal):
+        for j in np.arange(0, N_C):
+            C_exp[j, :, i] = np.transpose(np.linalg.inv(R_D[:, :, i]) * (R_A[:, :, i] * (c[j]) + p_A[:, i] - p_D[:, i]))
+
+    # Part 2: Distortion Correction (See function)
+
+    # Part 3: EM pivot calibration using distortion correction to find b_j
+    emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
+    N_G = emPivotSize[0]
+    N_framesEM = emPivotSize[1]
+
+    # Find position of markers relative to sensor
+    G = np.zeros((N_G, 3, N_framesEM))
+    ind = 0
+    for i in np.arange(0, N_framesEM)
+        G[:, :, i] = emPivotData[np.arange(ind, ind + N_G), :]
+        ind = ind + N_G
+
+    # Use distortion correction
+    G_correct = np.zeros((N_G, 3, N_framesEM))
+    for i in np.arange(0, N_framesEM)
+        for j in np.arange(0, N_G)
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
+
+
+
+    # Part 4: Compute F_reg
+
+    # Part 5: Apply distortion correction to G[n]
+
+    # Part 6: Compute pointer tip coordinates wrt tracker base
 
     # Apply F_reg to compute tip location wrt CT image
 
