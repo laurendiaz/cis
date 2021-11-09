@@ -38,7 +38,7 @@ def distortionCorrection(p,q):
 
 def main():
     # input body calibration data file 
-    print('Enter the name of your input data file (e.g. pa1-debug-a): ')
+    print('Enter the name of your input data file (e.g. pa2-debug-a): ')
     filename = input()
     calBodyData, calBodySize = cartesian.readInput_Body(filename + '-calbody.txt')
     calReadData, calReadSize = cartesian.readInput_Readings(filename + '-calreadings.txt')
