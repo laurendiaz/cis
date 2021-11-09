@@ -83,7 +83,7 @@ def FindBestRigidTransformation(A, B):
     R = vh.T * u.T
 
     if np.linalg.det(R) < 0:
-        vh[2,:] *= -1 # fix if neg
+        vh[2, :] *= -1 # fix if neg
         R = vh.T * u.T
 
     # compute optimal translation 
@@ -91,7 +91,7 @@ def FindBestRigidTransformation(A, B):
     r2 = (a[0]*R[1][0]) + (a[1]*R[1][1]) + ((a[2]*R[1][2]))
     r3 = (a[0]*R[2][0]) + (a[1]*R[2][1]) + ((a[2]*R[2][2]))
     sub = np.array([r1, r2, r3])
-    b = b.reshape(7, 1)
+    # b = b.reshape(7, 1)
     t = b - sub
 
     F = cart.Frame(R, t)

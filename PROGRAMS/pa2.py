@@ -106,7 +106,7 @@ def main():
     C = np.zeros((N_C, 3, N_framescal))
 
     ind = 0
-    for i in np.arange(1, N_framescal).reshape(-1):
+    for i in np.arange(1, N_framescal):
         D[:, :, i] = calReadData[np.arange(ind, ind + N_D), :]
         ind = ind + N_D
         A[:, :, i] = calReadData[np.arange(ind, ind + N_A), :]
@@ -123,10 +123,10 @@ def main():
         F = icp.ICP(d, D[:, :, i], F0, eta0)
         R_i = F.get_rot()
         p_i = F.get_vec()
-        R_D[:, :, i] = R_i
+        R_D[:, :, i] = R_i[0:3, 0:3]  # This is due to icp error, need to revisit
         print(p_D.shape)
         print(p_i.shape)
-        p_D[:, i] = p_i[:, 1]
+        p_D[:, i] = p_i[1, :]
 
     # Calculate F_A = [R_A, p_A]
     # R_A is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
