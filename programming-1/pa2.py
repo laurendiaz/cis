@@ -173,6 +173,10 @@ def main():
         B[i, :] = np.transpose(R_i * p_tip + p_i)
 
     # Part 5: Compute F_reg
+    ctFiducialsData, ctFiducialsSize = cartesian.readInput_CtFiducials(filename + '-ct-fiducials.txt')
+    F_reg = icp.ICP(B, ctFiducialsData)
+    R_reg = F_reg.get_rot()
+    p_reg = F_reg.get_vec()
 
     # Part 6: Apply distortion correction to G[n]
 
