@@ -77,11 +77,11 @@ def main():
     N_framescal = calReadSize[3]
 
     # Position of markers with respect to the calibration body
-    d = calBodyData[np.arange(1, N_D + 1), :]
+    d = calBodyData[np.arange(0, N_D), :]
     d = d.astype(float)
-    a = calBodyData[np.arange(N_D + 1, N_A + N_D + 1), :]
+    a = calBodyData[np.arange(N_D, N_A + N_D), :]
     a = a.astype(float)
-    c = calBodyData[np.arange(N_D + N_A + 1, len(calBodyData) - 1), :]
+    c = calBodyData[np.arange(N_D + N_A, len(calBodyData)), :]
     c = c.astype(float)
 
     # Position of markers with respect to the trackers
@@ -122,13 +122,13 @@ def main():
         R_i = F.get_rot()
         p_i = F.get_vec()
         R_A[:, :, i] = R_i
-        p_A[:, i] = p_i[:, 1]
+        p_A[:, i] = p_i
 
     # Compute C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
-    C_exp = np.zeros((N_C, 3, N_framescal))
+    C_i = np.zeros((N_C, 3, N_framescal))
     for i in np.arange(0, N_framescal):
         for j in np.arange(0, N_C):
-            C_exp[j, :, i] = np.transpose(np.linalg.inv(R_D[:, :, i]) * (R_A[:, :, i] * (c[j]) + p_A[:, i] - p_D[:, i]))
+            C_i[j, :, i] = np.transpose(np.linalg.inv(R_D[:, :, i]) * (R_A[:, :, i] * np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))
 
     # Part 2: Distortion Correction (See function)
 
@@ -148,7 +148,7 @@ def main():
     G_correct = np.zeros((N_G, 3, N_framesEM))
     for i in np.arange(0, N_framesEM):
         for j in np.arange(0, N_G):
-            G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], vectCorr)
 
     # Define and use probe coordinate system to find g
     G2 = G_correct[:, :, 1]
@@ -178,7 +178,7 @@ def main():
     G_correct = np.zeros((N_G, 3, N_framesEM))
     for i in np.arange(0, N_framesEM):
         for j in np.arange(0, N_G):
-            G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], vectCorr)
 
     # Compute b_j of fiducials using new p_tip
     R_ptr = np.zeros((3, 3, N_B))
@@ -215,7 +215,7 @@ def main():
     G_correct = np.zeros((N_G, 3, N_framesEM))
     for i in np.arange(0, N_framesEM):
         for j in np.arange(0, N_G):
-            G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], vectCorr)
 
     # Compute pointer tip coordinates wrt tracker base
 
