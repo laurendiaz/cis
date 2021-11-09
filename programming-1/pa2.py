@@ -26,9 +26,18 @@ given some pointer data frames, you will report corresponding CT coordinates.
 def ScaleToBox(q, qmin, qmax):
     return (q - qmin) / (qmax - qmin)
 
-
 def Bernie(a, b):
     return scipy.special.comb(5, b) * (a ** b) * ((1 - a) ** (5 - b))
+
+def Tensor(v):
+    f = np.zeros((1, 216))
+    ind = 0
+    for i in np.arange(0, 5):
+        for j in np.arange(0, 5):
+            for k in np.arange(0, 5):
+                f[ind] = Bernie(v[0], i) * Bernie(v[1], j) * Bernie(v[2], k)
+                ind += 1
+    return f
 
 def distortionCorrection(p, q):
     '''
@@ -136,27 +145,33 @@ def main():
                 R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
     # Part 2: Distortion Correction (See function)
-    # truth = np.zeros(((N_C * N_framescal), 3))
-    # measurements = np.zeros(((N_C * N_framescal), 3))
-    # for i in np.arange(0, N_framescal):
-    #     truth = C_i[:, :, i]
-    #     measurements = C[:, :, i]
-    #
-    # # 1) determine bounding box to scale q_i values
-    # # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
-    # upper = 10000
-    # lower = 0
-    #
-    # mat = np.zeros((1, 3))
-    # for i in np.arange(start=1, stop=3, step=1):
-    #     mat[i] = ScaleToBox(p[i], lower, upper)
-    #
-    # # Coefficient from distance using least squares
-    # coefficient = np.zeros((216, 3))
-    # for i in np.arange(0, 2):
-    #     x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(mat, truth[:, i])
-    #     coefficient = [x, i]
+    # Create "ground truth" and EM measurements
+    truth = np.zeros(((N_C*N_framescal), 3))
+    emMeasure = np.zeros(((N_C*N_framescal), 3))
+    for i in np.arange(0, N_framescal):
+        truth = C_i[:, :, i]
+        emMeasure = C[:, :, i]
 
+    upper = 1000
+    lower = 0
+
+    # Create matrix with scaled measurements
+    v = np.zeros((N_C*N_framescal, 3))
+    f = np.zeros((N_C*N_framescal, 216))
+    for i in np.arange(0, N_C*N_framescal):
+        for j in np.arange(0, 2):
+            v[i, j] = ScaleToBox(emMeasure[i, j], lower, upper)
+        f = Tensor(v[i, :])
+
+    mat = np.zeros((1, 3))
+    for i in np.arange(start=1, stop=3, step=1):
+        mat[i] = ScaleToBox(p[i], lower, upper)
+
+    # Coefficient from distance using least squares
+    coefficient = np.zeros((216, 3))
+    for i in np.arange(0, 2):
+        x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(f, truth[:, i])
+        coefficient = [x, i]
 
     # Part 3: EM pivot calibration using distortion correction
     emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
