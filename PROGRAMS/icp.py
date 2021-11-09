@@ -30,6 +30,11 @@ def FindBestRigidTransformation(A, B):
     Return: - F: Frame data type from cartesian.py containing
               best rigid transformation calculated in the method
     '''
+    # inputs should be of size Nx3
+    assert(A.shape[1] == 3)
+    assert(B.shape[1] == 3) 
+    assert(len(A) == len(B))
+
     # calc size
     N = A.shape[0]
 
@@ -41,46 +46,15 @@ def FindBestRigidTransformation(A, B):
     X = A - np.tile(a, (N, 1))
     Y = B - np.tile(b, (N, 1))
 
-    '''
-    X = np.empty(1)
-    Y = np.empty(1)
-
-    
-
-    x = 0
-    y = 0
-
-    begin = True
-    for i in A:
-        x = i - a
-        if begin == True:
-            X = np.array([x])
-            begin = False
-        else:
-            xarr = np.array([x])
-            X = np.concatenate((X, xarr), axis=0)
-
-    begin = True
-    for i in B:
-        y = i - b
-        if begin == True:
-            Y = np.array([y])
-            begin = False
-        else:
-            yarr = np.array([y])
-            Y = np.concatenate((Y, yarr), axis=0)
-    '''
-    
-
     # compute d x d covariance matrix S = XWY^T
     # X and Y should be dxn where n and d are both 3
-    cov = np.transpose(X) * Y
+    cov = np.dot(np.transpose(X), Y)
 
     # compute the svd
     u, s, vh = np.linalg.svd(cov)  # A = USV^H
 
     # calculate rotation
-    R = vh.T * u.T
+    R = vh * u
 
     if np.linalg.det(R) < 0:
         vh[2,:] *= -1 # fix if neg
@@ -91,7 +65,6 @@ def FindBestRigidTransformation(A, B):
     r2 = (a[0]*R[1][0]) + (a[1]*R[1][1]) + ((a[2]*R[1][2]))
     r3 = (a[0]*R[2][0]) + (a[1]*R[2][1]) + ((a[2]*R[2][2]))
     sub = np.array([r1, r2, r3])
-    b = b.reshape(7, 1)
     t = b - sub
 
     F = cart.Frame(R, t)
@@ -158,16 +131,16 @@ def ICP(M, Q, F0, eta0):
     A = np.empty(1)
     B = np.empty(1)
 
+    c = 0
+    i = 0
+    d = 0
+    e = 0
     terminate = False
     while terminate == False:
         k = 0
-        while k < Q.shape[1]:
+        done = False
+        while k < Q.shape[0]:
             bnd = 0
-            c = 0
-            i = 0
-            d = 0
-            e = 0
-
             if k == 0:
                 # pick the distance to any point in the other cloud
                 M[0] = np.array(list(map(np.float, M[0])))
@@ -186,16 +159,14 @@ def ICP(M, Q, F0, eta0):
                 C = np.concatenate((C, [c]), axis=0)
                 I = np.concatenate((I, [i]), axis=0)
                 D = np.concatenate((D, [d]), axis=0)
-
-            #print(d)
-            #print(eta)
             if d < eta:
-                if (k == 0):
+                if (done == False):
                     A = np.array([Q[k]])
                     B = np.array([C[k]])
+                    done = True
                 else:
-                    A = np.c_[A, [Q[k]]]
-                    B = np.c_[B, [C[k]]]
+                    A = np.concatenate((A, [Q[k]]), axis=0)
+                    B = np.concatenate((B, [C[k]]), axis=0)
 
                 # Ek - residual errors bk - F dot ak
                 if k == 0:
