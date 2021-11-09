@@ -238,6 +238,8 @@ def main():
     outname = filename + '-output2.txt'
     outpath = 'outputs/' + outname
     fileID = open(outpath, 'w')
+    fileID.write('%3d, %s\n' % N_framesEM, outname)
+    fileID.write('%d, %d, %d\n' %b_j[0], b_j[1], b_j[2])
 
     return 0
 
