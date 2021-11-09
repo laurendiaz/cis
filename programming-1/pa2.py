@@ -128,7 +128,7 @@ def main():
     C_i = np.zeros((N_C, 3, N_framescal))
     for i in np.arange(0, N_framescal):
         for j in np.arange(0, N_C):
-            C_i[j, :, i] = np.transpose(np.linalg.inv(R_D[:, :, i]) * (R_A[:, :, i] * np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))
+            C_i[j, :, i] = np.transpose(R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
     # Part 2: Distortion Correction (See function)
 
