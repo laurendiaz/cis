@@ -32,12 +32,13 @@ def Bernie(a, b):
 
 # Returns "tensor forms" of interpolation polynomials
 def Tensor(v):
-    f = np.zeros((1, 216))
+    rows = len(v)
+    f = np.zeros((rows, 216))
     ind = 0
     for i in np.arange(0, 5):
         for j in np.arange(0, 5):
             for k in np.arange(0, 5):
-                f[ind] = Bernie(v[0], i) * Bernie(v[1], j) * Bernie(v[2], k)
+                f[:, ind] = Bernie(v[0], i) * Bernie(v[1], j) * Bernie(v[2], k)
                 ind += 1
     return f
 
@@ -148,22 +149,23 @@ def main():
 
     # Part 2: Distortion Correction (See function)
     # Create "ground truth" and EM measurements
-    truth = np.zeros(((N_C*N_framescal), 3))
-    emMeasure = np.zeros(((N_C*N_framescal), 3))
+    truth = []
+    emMeasure = []
     for i in np.arange(0, N_framescal):
-        truth = C_i[:, :, i]
-        emMeasure = C[:, :, i]
+        for j in np.arange(0, N_C):
+            truth = np.array(C_i[j, :, i], dtype=object)
+            emMeasure = np.array(C[j, :, i], dtype=object)
 
-    upper = 1000
-    lower = 0
+    qmax = 1000
+    qmin = 0
 
     # Create matrix with scaled measurements
     v = np.zeros((N_C*N_framescal, 3))
     f = np.zeros((N_C*N_framescal, 216))
     for i in np.arange(0, N_C*N_framescal):
         for j in np.arange(0, 2):
-            v[i, j] = ScaleToBox(emMeasure[i, j], lower, upper)
-        f = Tensor(v[:, i])
+            v[i, j] = ScaleToBox(emMeasure[i, j], qmin, qmax)
+        f = np.array(Tensor(v[i, :]), dtype=object)
 
     # Coefficient from distance using least squares
     coefficient = np.zeros((216, 3))
