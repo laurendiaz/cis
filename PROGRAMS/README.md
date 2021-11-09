@@ -5,7 +5,13 @@ by Russell Chow and Lauren Diaz
 Used in conjunction with numpy and scipy libraries for needs pertaining to Cartesian math including a simple Frame data structure was written with getters and setters and functions were developed to manipulate this data structure for our purposes.
 
 Functions:
-- readInput_
+- readInput_Body
+- readInput_Readings
+- readInput_EmPivot
+- readInput_OptPivot
+- readInput_CtFiducials
+- readInput_EmFiducialss
+- readInput_EmNav
 - frameVecProd
 - frameInv
 - frameProd

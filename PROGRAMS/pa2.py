@@ -53,7 +53,7 @@ def distortionCorrection(p, q):
     '''
     # 1) determine bounding box to scale q_i values
     # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
-    upper = 10000
+    upper = 1000
     lower = 0
 
     mat = np.zeros(1, 3)
@@ -146,7 +146,7 @@ def main():
         for j in np.arange(0, N_C):
             C_i[j, :, i] = np.transpose(R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
-    # Part 2: Distortion Correction (See function)
+    # Part 2: Distortion Calibration
     # Create "ground truth" and EM measurements
     truth = []
     emMeasure = []
@@ -262,7 +262,7 @@ def main():
     p_ptr = np.zeros((3, N_framesEM))
     B = np.zeros((N_framesEM, 3))
     for i in np.arange(0, N_framesEM):
-        F_ptr = icp.ICP(g, G_correct[:, :, i])
+        F_ptr = icp.ICP(g, G_correct[:, :, i], F0, eta0)
         R_ptr = F_ptr.get_rot()
         p_ptr = F_ptr.get_vec()
         B[i, :] = np.transpose(R_i * p_tip + p_i)
