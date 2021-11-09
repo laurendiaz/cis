@@ -178,11 +178,29 @@ def main():
     R_reg = F_reg.get_rot()
     p_reg = F_reg.get_vec()
 
-    # Part 6: Apply distortion correction to G[n]
+    # Part 6: Compute tip location with respect to CT image
+    emNavData, emNavSize = cartesian.readInput_EmNav(filename + '-EM-nav.txt')
+    N_G = emNavSize[0]
+    N_framesEM = emNavSize[1]
+
+    # Position of markers relative to N_frameEM points
+    G = np.zeros((N_G, 3, N_framesEM))
+    ind = 0
+    for i in np.arange(0, N_framesEM):
+        G[:, :, i] = emNavData[np.arange(ind, ind + N_G), :]
+        ind = ind + N_G
+
+    # Apply distortion correction to G
+    G_correct = np.zeros((N_G, 3, N_framesEM))
+    for i in np.arange(0, N_framesEM):
+        for j in np.arange(0, N_G):
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
+
+
 
     # Compute pointer tip coordinates wrt tracker base
 
-    # Apply F_reg to compute tip location wrt CT image
+    # Apply F_reg to
 
 
     return 0
