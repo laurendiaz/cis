@@ -27,20 +27,29 @@ def FindBestRigidTransformation(A, B):
     https://igl.ethz.ch/projects/ARAP/svd_rot.pdf
     Given: - A
            - B
-           - F
     Return: - F: Frame data type from cartesian.py containing
               best rigid transformation calculated in the method
     '''
+    # calc size
+    N = A.shape[0]
+
     # compute centroids of both point sets
-    a = np.sum(A) / A.shape[1]
-    b = np.sum(B) / B.shape[1]
+    a = np.mean(A, axis=0)
+    b = np.mean(B, axis=0)
 
     # compute centered vectors
+    X = A - np.tile(a, (N, 1))
+    Y = B - np.tile(b, (N, 1))
+
+    '''
     X = np.empty(1)
     Y = np.empty(1)
 
+    
+
     x = 0
     y = 0
+
     begin = True
     for i in A:
         x = i - a
@@ -60,23 +69,29 @@ def FindBestRigidTransformation(A, B):
         else:
             yarr = np.array([y])
             Y = np.concatenate((Y, yarr), axis=0)
+    '''
+    
 
     # compute d x d covariance matrix S = XWY^T
-    # X and Y should be dxn where n is length of given arrays and d is
-    W = np.eye(A.shape[1])
-    S = np.dot(np.dot(X, W), np.transpose(Y))
+    # X and Y should be dxn where n and d are both 3
+    cov = np.transpose(X) * Y
 
-    # compute the svd (gives rotation)
-    u, s, vh = np.linalg.svd(S)  # A = USV^H
+    # compute the svd
+    u, s, vh = np.linalg.svd(cov)  # A = USV^H
 
-    ye = np.eye(vh.shape[0])
-    ye[-1][-1] = np.linalg.det(np.dot(np.transpose(vh), np.transpose(u)))
-    R = np.dot(np.transpose(vh), ye)
+    # calculate rotation
+    R = vh.T * u.T
 
-    R = np.dot(R, np.transpose(vh))
+    if np.linalg.det(R) < 0:
+        vh[2,:] *= -1 # fix if neg
+        R = vh.T * u.T
 
-    # compute optimal translation as t = q - Rp
-    t = b - np.dot(R, a)
+    # compute optimal translation 
+    r1 = (a[0]*R[0][0]) + (a[1]*R[0][1]) + ((a[2]*R[0][2]))
+    r2 = (a[0]*R[1][0]) + (a[1]*R[1][1]) + ((a[2]*R[1][2]))
+    r3 = (a[0]*R[2][0]) + (a[1]*R[2][1]) + ((a[2]*R[2][2]))
+    sub = np.array([r1, r2, r3])
+    t = b - sub
 
     F = cart.Frame(R, t)
     return F

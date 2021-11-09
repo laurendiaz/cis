@@ -3,6 +3,7 @@ import numpy as np
 import icp
 import math
 import pivotCalibration
+import scipy
 
 '''
 In this assignment, you will fit polynomials to model distortion and then use these polynomials to “dewarp” 
@@ -22,7 +23,10 @@ given some pointer data frames, you will report corresponding CT coordinates.
 '''
 
 def ScaleToBox(q, qmin, qmax):
-    return 0
+    return (q - qmin)/(qmax-qmin)
+
+def Bernie(a, b):
+    return scipy.special.comb(5, b) * (a**b) * ((1 - a)**(5 - b))
 
 def distortionCorrection(p,q):
     '''
@@ -30,15 +34,30 @@ def distortionCorrection(p,q):
         3D Navigational Sensor
         Construct a "tensor form" interpolation polynomial using 5th degree
         Bernstein polynomials F_ijk(u_x, u_y, u_z) = B_5,i(u_x)B_5,j(u_y)B_5,k(u_z)
-        Given: - p = known 3D ground truth
-               - q = values returned by navigational sensor
+        Given: - p = measurement to be corrected
+               - q = coeff from dist calibration
     '''
     # 1) determine bounding box to scale q_i values 
         # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
+    upper = 10000
+    lower = 0
+
+    mat = np.zeros(1, 3)
+    for i in np.arange(start=1, stop=3, step=1):
+        mat[i] = ScaleToBox(p[i], lower, upper) 
     # 2) set up and solve least squares problem:
         # [F_000(u_s) ... F_555(u_s)] [[c_000^x, c_000^y, c_000^z][... ... ...][c_555^x, c_555^y, c_555^z]] = [p_s^x, p_s^y, p_s^z]
+    vectCorr = np.zeros(1,3)
+    count = 0
+    for i in np.arange(1, 5, 1):
+        for j in np.arange(1, 5, 1):
+            for k in np.arange(1, 5, 1):
+                c_ijk = q[count,:]
+                five = Bernie(vectCorr[0], i) * Bernie(vectCorr[1], j) * Bernie(vectCorr[2], k)
+                vectCorr = vectCorr + (c_ijk * five)
+                count += 1
     #return Sigma Sigma Sigma c_i,j,k B_5,i(u_x) B_5,j(u_y) B_5,k(u_z)
-    return 0
+    return vectCorr
 
 def main():
     # Part 1: Process data the values of C_i^expected [k] corresponding to each C_i [k] in each “frame” k of data.
@@ -167,7 +186,9 @@ def main():
     B = np.zeros((N_B, 3))
 
     for i in np.arange(0, N_B):
-        R_i, p_i = icp.ICP(g, G[:, :, i], F0, eta0)
+        F = icp.ICP(g, G[:, :, i], F0, eta0)
+        R_i = F.get_rot()
+        p_i = F.get_vec()
         R_ptr[:, :, i] = R_i
         p_ptr[:, i] = p_i
         B[i, :] = np.transpose(R_i * p_tip + p_i)
