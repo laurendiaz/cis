@@ -131,7 +131,16 @@ def main():
         for j in np.arange(0, N_G)
             G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
 
+    # Define and use probe coordinate system to find g
+    G2 = G_correct[:, :, 1]
+    G_mid = np.mean(G2,1)
 
+    g = np.zeros(N_G, 3)
+    for i in np.arange(N_G, 3)
+        g[i, :] = G2[i, :] - G_mid
+
+    # Pivot calibration using distortion correction
+    p_tip, p_dimple = pivotCalibration.pivotCalibration(g, G_correct)
 
     # Part 4: Compute F_reg
 
