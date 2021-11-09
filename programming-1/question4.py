@@ -58,7 +58,7 @@ for i in np.arange(0, N_framescal):
     R_D[:, :, i] = R_i
     print(p_D.shape)
     print(p_i.shape)
-    p_D[:, i] = p_i
+    p_D[:, i] = p_i[:, 1]
 
 # Part B: Calculate F_A = [R_A, p_A]
 # R_A is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
@@ -70,7 +70,7 @@ for i in np.arange(0, N_framescal):
     R_i = F.get_rot()
     p_i = F.get_vec()
     R_A[:, :, i] = R_i
-    p_A[:, i] = p_i
+    p_A[:, i] = p_i[:, 1]
 
 # Part C: Compute C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
 C_exp = np.zeros((N_C, 3, N_framescal))
