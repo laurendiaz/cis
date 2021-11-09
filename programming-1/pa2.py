@@ -43,7 +43,20 @@ def main():
     calBodyData, calBodySize = cartesian.readInput_Body(filename + '-calbody.txt')
     calReadData, calReadSize = cartesian.readInput_Readings(filename + '-calreadings.txt')
 
-    #process data the values of C_i^expected [k] corresponding to each C_i [k] in each “frame” k of data.
+    # process data the values of C_i^expected [k] corresponding to each C_i [k] in each “frame” k of data.
+
+    # Use distortion correction as pivot calibration for EM probe
+
+    # Use distortion correction and new pivot value to find b_j wrt EM tracker base coordinate system
+
+    # Compute F_reg
+
+    # Apply distortion correction to G[n]
+
+    # Compute pointer tip coordinates wrt tracker base
+
+    # Apply F_reg to compute tip location wrt CT image
+
 
     return 0
 
