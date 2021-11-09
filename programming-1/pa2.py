@@ -174,7 +174,7 @@ def main():
 
     # Part 5: Compute F_reg
     ctFiducialsData, ctFiducialsSize = cartesian.readInput_CtFiducials(filename + '-ct-fiducials.txt')
-    F_reg = icp.ICP(B, ctFiducialsData)
+    F_reg = icp.ICP(B, ctFiducialsData, F0, eta0)
     R_reg = F_reg.get_rot()
     p_reg = F_reg.get_vec()
 
@@ -196,12 +196,27 @@ def main():
         for j in np.arange(0, N_G):
             G_correct[j, :, i] = distortionCorrection(G[j, :, i], distortionCoefficient)
 
-
-
     # Compute pointer tip coordinates wrt tracker base
 
-    # Apply F_reg to
+    R_ptr = np.zeros((3, 3, N_framesEM))
+    p_ptr = np.zeros((3, N_framesEM))
+    B = np.zeros((N_framesEM, 3))
+    for i in np.arange(0, N_framesEM):
+        F_ptr = icp.ICP(g, G_correct[:, :, i])
+        R_ptr = F_ptr.get_rot()
+        p_ptr = F_ptr.get_vec()
+        B[i, :] = np.transpose(R_i * p_tip + p_i)
 
+    # Compute b_j of test points with respect to EM tracker base coordinates
+    # and apply F_reg to find tip locations
+    b_j = np.zeros(N_framesEM, 3)
+    for i in np.arange(0, N_framesEM):
+        b_j[i, :] = np.transpose(R_reg * np.transpose(B[i, :]) + p_reg)
+
+    # Save and output results
+    outname = filename + '-output2.txt'
+    outpath = 'outputs/' + outname
+    fileID = open(outpath, 'w')
 
     return 0
 
