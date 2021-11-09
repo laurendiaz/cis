@@ -189,7 +189,7 @@ def main():
     G_correct = np.zeros((N_G, 3, N_framesEM))
     for i in np.arange(0, N_framesEM):
         for j in np.arange(0, N_G):
-            G_correct[j, :, i] = distortionCorrection(G[j, :, i], vectCorr)
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
 
     # Define and use probe coordinate system to find g
     G2 = G_correct[:, :, 1]
@@ -219,7 +219,7 @@ def main():
     G_correct = np.zeros((N_G, 3, N_framesEM))
     for i in np.arange(0, N_framesEM):
         for j in np.arange(0, N_G):
-            G_correct[j, :, i] = distortionCorrection(G[j, :, i], vectCorr)
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
 
     # Compute b_j of fiducials using new p_tip
     R_ptr = np.zeros((3, 3, N_B))
@@ -256,7 +256,7 @@ def main():
     G_correct = np.zeros((N_G, 3, N_framesEM))
     for i in np.arange(0, N_framesEM):
         for j in np.arange(0, N_G):
-            G_correct[j, :, i] = distortionCorrection(G[j, :, i], vectCorr)
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
 
     # Compute pointer tip coordinates wrt tracker base
 
