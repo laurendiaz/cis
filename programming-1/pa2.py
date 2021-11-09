@@ -30,7 +30,6 @@ def ScaleToBox(q, qmin, qmax):
 def Bernie(a, b):
     return scipy.special.comb(5, b) * (a ** b) * ((1 - a) ** (5 - b))
 
-
 def distortionCorrection(p, q):
     '''
         Compute distortion correction function for a distorted
@@ -40,7 +39,7 @@ def distortionCorrection(p, q):
         Given: - p = measurement to be corrected
                - q = coeff from dist calibration
     '''
-    # 1) determine bounding box to scale q_i values 
+    # 1) determine bounding box to scale q_i values
     # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
     upper = 10000
     lower = 0
@@ -137,6 +136,27 @@ def main():
                 R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
     # Part 2: Distortion Correction (See function)
+    # truth = np.zeros(((N_C * N_framescal), 3))
+    # measurements = np.zeros(((N_C * N_framescal), 3))
+    # for i in np.arange(0, N_framescal):
+    #     truth = C_i[:, :, i]
+    #     measurements = C[:, :, i]
+    #
+    # # 1) determine bounding box to scale q_i values
+    # # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
+    # upper = 10000
+    # lower = 0
+    #
+    # mat = np.zeros((1, 3))
+    # for i in np.arange(start=1, stop=3, step=1):
+    #     mat[i] = ScaleToBox(p[i], lower, upper)
+    #
+    # # Coefficient from distance using least squares
+    # coefficient = np.zeros((216, 3))
+    # for i in np.arange(0, 2):
+    #     x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(mat, truth[:, i])
+    #     coefficient = [x, i]
+
 
     # Part 3: EM pivot calibration using distortion correction
     emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
