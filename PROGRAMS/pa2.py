@@ -297,16 +297,16 @@ def main():
     # Compute b_j of test points with respect to CT coordinate system
     # and apply F_reg to find tip locations
     b_j = np.zeros((N_framesEM, 3))
-    p_reg = np.reshape(p_reg, (3,4))
+    p_reg = np.reshape(p_reg, (3, 1))
     for i in np.arange(0, N_framesEM):
-        b_j[i, :] = np.transpose(np.dot(R_reg, np.transpose(B[i, :])) + p_reg)
+        b_j = np.transpose(np.dot(R_reg, np.transpose(B)) + p_reg)
 
     # Save and output results
     outname = filename + '-output2.txt'
     outpath = 'outputs/' + outname
-    fileID = open(outpath, 'w')
-    fileID.write('%3d, %s\n' % N_framesEM, outname)
-    fileID.write('%d, %d, %d\n' % b_j[0], b_j[1], b_j[2])
+    fileID = open(outpath)
+    fileID.write('%d, %s\n' % (N_framesEM, outname))
+    fileID.write('%d, %d, %d\n' % (b_j[0], b_j[1], b_j[2]))
 
     return 0
 
