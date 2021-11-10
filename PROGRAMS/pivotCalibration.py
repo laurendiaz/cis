@@ -39,8 +39,8 @@ def pivotCalibration(j, J):
     Left = np.zeros((3, 6))
     Right = np.zeros((3, 1))
     for i in np.arange(0, N_frames):
-        Left = R.transpose() - np.eye(3)
-        Right = -p.transpose()
+        Left = R.transpose().reshape(36, 3) - np.eye(2)
+        Right = -p.transpose().reshape(3, 1)
     # Left.shape
     # Right.shape
 
