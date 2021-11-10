@@ -165,9 +165,14 @@ def main():
 
     # Coefficient from distance using least squares
     coefficient = np.zeros((216, 3))
-    # for i in np.arange(0, 2):
-    #     x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(f, truth[:, i])
-    #     coefficient = [x, i]
+    for i in np.arange(0, 2):
+        #the issue here is that f and truth should be of size (M, N) and (M, K), respectively
+        x, res, rnk, s = scipy.linalg.lstsq(f, truth[:, i])
+
+        #I'm not sure what you're trying to do here but this isn't proper python syntax
+        #if you're trying to append onto coefficient you should do something like
+        #coefficient[whateverindex/indices] = whatyouwanttoappend
+        coefficient = [x, i]
 
     # Part 3: EM pivot calibration using distortion correction
     emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
@@ -196,7 +201,9 @@ def main():
         g[i, :] = G2[i, :] - G_mid
 
     # Pivot calibration using distortion correction
-    p_tip, p_dimple = pivotCalibration.pivotCalibration(g, G_correct)
+    print(g)
+    print(G_correct)
+    p_tip, p_dimple, R, p = pivotCalibration.pivotCalibration(g, G_correct)
 
     # Part 4: Using the distortion correction and the improved pivot value, compute b_j, the locations of the
     # fiducials points with respect to the EM tracker base coordinate system
