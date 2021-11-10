@@ -76,16 +76,16 @@ def distortionCorrection(p, q):
     lower = 0
 
     mat = np.zeros((1, 3))
-    for i in np.arange(start=1, stop=3, step=1):
-        mat[i] = ScaleToBox(p[i], lower, upper)
+    for i in np.arange(0, 3):
+        mat[:, i] = ScaleToBox(p[i], lower, upper)
 
     # 2) set up and solve least squares problem:
     # [F_000(u_s) ... F_555(u_s)] [[c_000^x, c_000^y, c_000^z][... ... ...][c_555^x, c_555^y, c_555^z]] = [p_s^x, p_s^y, p_s^z]
-    vectCorr = np.zeros(1, 3)
+    vectCorr = np.zeros((1, 3))
     count = 0
-    for i in np.arange(1, 5, 1):
-        for j in np.arange(1, 5, 1):
-            for k in np.arange(1, 5, 1):
+    for i in np.arange(0, 6):
+        for j in np.arange(0, 6):
+            for k in np.arange(0, 6):
                 c_ijk = q[count, :]
                 five = Bernie(vectCorr[0], i) * Bernie(vectCorr[1], j) * Bernie(vectCorr[2], k)
                 vectCorr = vectCorr + (c_ijk * five)
@@ -178,7 +178,7 @@ def main():
     # Create matrix with scaled measurements
     v = np.zeros((N_C * N_framescal, 3))
     f = np.zeros((N_C * N_framescal, 216))
-    for i in np.arange(0, N_C * N_framescal - 1):
+    for i in np.arange(0, N_C * N_framescal):
         for j in np.arange(0, 2):
             v[i, j] = ScaleToBox(emMeasure[i, j], qmin, qmax)
         f[i, :] = Tensor(v[i, :])[1, :]
@@ -189,7 +189,7 @@ def main():
     # truth = truth.tolist()
     for i in np.arange(0, 2):
         # the issue here is that f and truth should be of size (M, N) and (M, K), respectively
-        x, res, rnk, s = scipy.linalg.lstsq(f[i, :], truth[:, i])
+        x, res, rnk, s = scipy.linalg.lstsq(f, truth[:, i])
         coefficient[:, i] = x
 
     # Part 3: EM pivot calibration using distortion correction
@@ -206,9 +206,9 @@ def main():
 
     # Use distortion correction
     G_correct = np.zeros((N_G, 3, N_framesEM))
-    # for i in np.arange(0, N_framesEM):
-    #     for j in np.arange(0, N_G):
-    #         G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
+    for i in np.arange(0, N_framesEM):
+        for j in np.arange(0, N_G):
+            G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
 
     # Define and use probe coordinate system to find g
     G2 = G_correct[:, :, 1]

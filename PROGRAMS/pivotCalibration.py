@@ -18,13 +18,13 @@ def pivotCalibration(j, J):
     '''
     theta = 45
     r = np.array([[1, 0, 0],
-                [0, math.cos(theta), -math.sin(theta)],
-                [0, math.sin(theta), math.cos(theta)]])
+                  [0, math.cos(theta), -math.sin(theta)],
+                  [0, math.sin(theta), math.cos(theta)]])
     F0 = cartesian.Frame(r, [1, 1, 1])
     eta0 = 1000000000000000
     R = np.zeros((3, 3, N_frames))
     p = np.zeros((3, N_frames))
-    for i in np.arange(0, N_frames):
+    for i in np.arange(0, N_frames - 1):
         F = ICP(j, J[:, :, i], F0, eta0)  # apply ICP registration
         R_i = F.get_rot()
         p_i = F.get_vec()
@@ -36,17 +36,16 @@ def pivotCalibration(j, J):
     [Ri|-I]*[ptip;ppivot] = [-pi]
     '''
     # Build Left matrix [Ri|-I] and Right matrix [-pi] for all frames
-    Left = np.zeros((3, 6))
-    Right = np.zeros((3, 1))
-    for i in np.arange(0, N_frames):
-        Left = R.transpose().reshape(36, 3) - np.eye(2)
-        Right = -p.transpose().reshape(3, 1)
+    Left = []
+    Right = []
+    for i in np.arange(0, N_frames, 3):
+        Left[i, :] = np.hstack([R[:, :, i], -np.eye(3)])
+        Right[i, :] = -p[:, i]
     # Left.shape
     # Right.shape
 
     # Solving least squares
-    x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(Left, Right)
-    #print(resnorm)
+    x = scipy.linalg.lstsq(Left, Right)
     ptip = x(np.arange(0, 2))
     ppivot = x(np.arange(3, 5))
 
