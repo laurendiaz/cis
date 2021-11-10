@@ -87,7 +87,7 @@ def distortionCorrection(p, q):
         for j in np.arange(0, 6):
             for k in np.arange(0, 6):
                 c_ijk = q[count, :]
-                five = Bernie(vectCorr[0], i) * Bernie(vectCorr[1], j) * Bernie(vectCorr[2], k)
+                five = Bernie(mat[:, 0], i) * Bernie(mat[:, 1], j) * Bernie(mat[:, 2], k)
                 vectCorr = vectCorr + (c_ijk * five)
                 count += 1
     # return Sigma Sigma Sigma c_i,j,k B_5,i(u_x) B_5,j(u_y) B_5,k(u_z)
