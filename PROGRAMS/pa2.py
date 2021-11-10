@@ -178,10 +178,10 @@ def main():
     # Create matrix with scaled measurements
     v = np.zeros((N_C * N_framescal, 3))
     f = np.zeros((N_C * N_framescal, 216))
-    for i in np.arange(0, N_C * N_framescal):
+    for i in np.arange(0, N_C * N_framescal - 1):
         for j in np.arange(0, 2):
             v[i, j] = ScaleToBox(emMeasure[i, j], qmin, qmax)
-        f[i, :] = np.transpose(np.array(Tensor(v[i, :]), dtype=object))
+        f[i, :] = Tensor(v[i, :])[1, :]
 
     # Coefficient from distance using least squares to be used in distortion coefficient
     coefficient = np.zeros((216, 3))
