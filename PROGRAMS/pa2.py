@@ -85,7 +85,7 @@ def main():
                   [0, math.cos(45), -math.sin(45)],
                   [0, math.sin(45), math.cos(45)]])
     F0 = cartesian.Frame(R, [1, 1, 1])
-    eta0 = 1000000000000000
+    eta0 = 10000000000000000000
 
     N_D = calBodySize[0]
     N_A = calBodySize[1]
@@ -123,10 +123,8 @@ def main():
         F = icp.ICP(d, D[:, :, i], F0, eta0)
         R_i = F.get_rot()
         p_i = F.get_vec()
-        R_D[:, :, i] = R_i[0:3, 0:3]  # This is due to icp error, need to revisit
-        print(p_D.shape)
-        print(p_i.shape)
-        p_D[:, i] = p_i[1, :]
+        R_D[:, :, i] = R_i
+        p_D[:, i] = p_i
 
     # Calculate F_A = [R_A, p_A]
     # R_A is a 3x3xN_frames 3D matrix, each page corresponds to the rotation matrix of a frame
