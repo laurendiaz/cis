@@ -221,7 +221,8 @@ def main():
     # Pivot calibration using distortion correction
     # print(g)
     # print(G_correct)
-    p_tip, p_dimple, R, p = pivotCalibration.pivotCalibration(g, G_correct)
+    # p_tip, p_dimple, R, p = pivotCalibration.pivotCalibration(g, G_correct)
+    p_tip = np.zeros((3, 1))
 
     # Part 4: Using the distortion correction and the improved pivot value, compute b_j, the locations of the
     # fiducials points with respect to the EM tracker base coordinate system
@@ -253,7 +254,7 @@ def main():
         p_i = F.get_vec()
         R_ptr[:, :, i] = R_i
         p_ptr[:, i] = p_i
-        B[i, :] = np.transpose(R_i * p_tip + p_i)
+        B[i, :] = np.transpose(R_i * p_tip + p_i.reshape(3, 1))
 
     # Part 5: Compute F_reg
     ctFiducialsData, ctFiducialsSize = cartesian.readInput_CtFiducials(filename + '-ct-fiducials.txt')

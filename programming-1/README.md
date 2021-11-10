@@ -27,6 +27,7 @@ Functions:
 - FindBestRigidTransformation
 - TerminationTest
 - ICP (effectively the main)
+
 ### pivotCalibration.py
 Function that Computes position of the tool tip and the calibration post for pivot calibration.
 

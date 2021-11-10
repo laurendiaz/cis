@@ -36,7 +36,7 @@ Functions:
 Function that computes position of the tool tip and the calibration post for pivot calibration.
 
 ### pa2.py
-Main script that runs the processes for part 1 through 6 of PA2.
+Main script that runs the processes for part 1 through 6 of PA2 resulting in the tool tip position.
 
 Functions:
 - ScaleToBox
