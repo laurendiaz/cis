@@ -219,8 +219,8 @@ def main():
         g[i, :] = G2[i, :] - G_mid
 
     # Pivot calibration using distortion correction
-    print(g)
-    print(G_correct)
+    # print(g)
+    # print(G_correct)
     p_tip, p_dimple, R, p = pivotCalibration.pivotCalibration(g, G_correct)
 
     # Part 4: Using the distortion correction and the improved pivot value, compute b_j, the locations of the
@@ -237,8 +237,8 @@ def main():
         ind = ind + N_G
 
     # Use distortion correction with fiducial data
-    G_correct = np.zeros((N_G, 3, N_framesEM))
-    for i in np.arange(0, N_framesEM):
+    G_correct = np.zeros((N_G, 3, 6))
+    for i in np.arange(0, 6):
         for j in np.arange(0, N_G):
             G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
 

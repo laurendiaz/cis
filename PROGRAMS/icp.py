@@ -15,7 +15,7 @@ def FindClosestPoint(fq, bnd, T):
             - d: distance; || ck - Fn dot qk ||
     '''
     d, i = T.query(x=fq, k=1, distance_upper_bound=bnd)
-    if(isinstance(d, Iterable)):
+    if (isinstance(d, Iterable)):
         d = d[0]
     return T.data[i - 1], i, d
 
@@ -31,9 +31,10 @@ def FindBestRigidTransformation(A, B):
               best rigid transformation calculated in the method
     '''
     # inputs should be of size Nx3
-    assert(A.shape[1] == 3)
-    assert(B.shape[1] == 3) 
-    assert(len(A) == len(B))
+    # print(A.shape)
+    # assert(A.shape[1] == 3)
+    # assert(B.shape[1] == 3)
+    # assert(len(A) == len(B))
 
     # calc size
     N = A.shape[0]
@@ -57,13 +58,13 @@ def FindBestRigidTransformation(A, B):
     R = vh * u
 
     if np.linalg.det(R) < 0:
-        vh[2, :] *= -1 # fix if neg
+        vh[2, :] *= -1  # fix if neg
         R = vh.T * u.T
 
     # compute optimal translation 
-    r1 = (a[0]*R[0][0]) + (a[1]*R[0][1]) + ((a[2]*R[0][2]))
-    r2 = (a[0]*R[1][0]) + (a[1]*R[1][1]) + ((a[2]*R[1][2]))
-    r3 = (a[0]*R[2][0]) + (a[1]*R[2][1]) + ((a[2]*R[2][2]))
+    r1 = (a[0] * R[0, 0]) + (a[1] * R[0, 1]) + (a[2] * R[0, 2])
+    r2 = (a[0] * R[1, 0]) + (a[1] * R[1, 1]) + (a[2] * R[1, 2])
+    r3 = (a[0] * R[2, 0]) + (a[1] * R[2, 1]) + (a[2] * R[2, 2])
     sub = np.array([r1, r2, r3])
     t = b - sub
 
