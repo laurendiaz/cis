@@ -23,7 +23,6 @@ given some pointer data frames, you will report corresponding CT coordinates.
 '''
 
 
-
 def ScaleToBox(q, qmin, qmax):
     """
         Scales q
@@ -298,15 +297,20 @@ def main():
     # and apply F_reg to find tip locations
     b_j = np.zeros((N_framesEM, 3))
     p_reg = np.reshape(p_reg, (3, 1))
+    B = np.transpose(B)
     for i in np.arange(0, N_framesEM):
-        b_j = np.transpose(np.dot(R_reg, np.transpose(B)) + p_reg)
+        b_j[i, :] = np.transpose(np.dot(R_reg, np.reshape(B[:, i], (3, 1))) + p_reg)
 
     # Save and output results
     outname = filename + '-output2.txt'
     outpath = 'outputs/' + outname
-    fileID = open(outpath)
+    fileID = open(outpath, 'w+')
     fileID.write('%d, %s\n' % (N_framesEM, outname))
-    fileID.write('%d, %d, %d\n' % (b_j[0], b_j[1], b_j[2]))
+    fileID.write('%d, %d, %d\n%d, %d, %d\n%d, %d, %d\n%d, %d, %d\n' % (b_j[0, 0], b_j[0, 1], b_j[0, 2],
+                                                                       b_j[1, 0], b_j[1, 1], b_j[1, 2],
+                                                                       b_j[2, 0], b_j[2, 1], b_j[2, 2],
+                                                                       b_j[3, 0], b_j[3, 1], b_j[3, 2]))
+    fileID.close()
 
     return 0
 
