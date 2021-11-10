@@ -24,7 +24,7 @@ def pivotCalibration(j, J):
     eta0 = 1000000000000000
     R = np.zeros((3, 3, N_frames))
     p = np.zeros((3, N_frames))
-    for i in np.arange(1, N_frames + 1).reshape(-1):
+    for i in np.arange(0, N_frames):
         F = ICP(j, J[:, :, i], F0, eta0)  # apply ICP registration
         R_i = F.get_rot()
         p_i = F.get_vec()
@@ -36,19 +36,18 @@ def pivotCalibration(j, J):
     [Ri|-I]*[ptip;ppivot] = [-pi]
     '''
     # Build Left matrix [Ri|-I] and Right matrix [-pi] for all frames
-    Left = []
-    Right = []
-    for i in np.arange(1, N_frames + 1).reshape(-1):
-        Left = np.array([[Left], [R[:, :, i], - np.eye(3)]])
-        Right = np.array([[Right], [- p[:, i]]])
-
+    Left = np.zeros((3, 6))
+    Right = np.zeros((3, 1))
+    for i in np.arange(0, N_frames):
+        Left = R.transpose() - np.eye(3)
+        Right = -p.transpose()
     # Left.shape
     # Right.shape
 
     # Solving least squares
     x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(Left, Right)
     #print(resnorm)
-    ptip = x(np.arange(1, 3 + 1))
-    ppivot = x(np.arange(4, 6 + 1))
+    ptip = x(np.arange(0, 2))
+    ppivot = x(np.arange(3, 5))
 
     return ptip, ppivot, R, p
