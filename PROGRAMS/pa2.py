@@ -22,13 +22,16 @@ given some pointer data frames, you will report corresponding CT coordinates.
         respect to the CT image.
 '''
 
+
 # Scales q
 def ScaleToBox(q, qmin, qmax):
     return (q - qmin) / (qmax - qmin)
 
+
 # Returns Bernstein basis polynomials
 def Bernie(a, b):
     return scipy.special.comb(5, b) * (a ** b) * ((1 - a) ** (5 - b))
+
 
 # Returns "tensor forms" of interpolation polynomials
 def Tensor(v):
@@ -41,6 +44,7 @@ def Tensor(v):
                 f[:, ind] = Bernie(v[0], i) * Bernie(v[1], j) * Bernie(v[2], k)
                 ind += 1
     return f
+
 
 def distortionCorrection(p, q):
     '''
@@ -142,7 +146,8 @@ def main():
     C_i = np.zeros((N_C, 3, N_framescal))
     for i in np.arange(0, N_framescal):
         for j in np.arange(0, N_C):
-            C_i[j, :, i] = np.transpose(R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
+            C_i[j, :, i] = np.transpose(
+                R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
     # Part 2: Distortion Calibration
     # Create "ground truth" and EM measurements
@@ -156,23 +161,21 @@ def main():
     qmin = 0
 
     # Create matrix with scaled measurements
-    v = np.zeros((N_C*N_framescal, 3))
-    f = np.zeros((N_C*N_framescal, 216))
-    for i in np.arange(0, N_C*N_framescal):
+    v = np.zeros((N_C * N_framescal, 3))
+    f = np.zeros((N_C * N_framescal, 216))
+    for i in np.arange(0, N_C * N_framescal):
         for j in np.arange(0, 2):
             v[i, j] = ScaleToBox(emMeasure[i, j], qmin, qmax)
-        f = np.array(Tensor(v[i, :]), dtype=object)
+        f = np.array(Tensor(v[i, :]), dtype=float)
 
-    # Coefficient from distance using least squares
+    # Coefficient from distance using least squares to be used in distortion coefficient
     coefficient = np.zeros((216, 3))
+    # f = f.tolist()
+    # truth = truth.tolist()
     for i in np.arange(0, 2):
-        #the issue here is that f and truth should be of size (M, N) and (M, K), respectively
-        x, res, rnk, s = scipy.linalg.lstsq(f, truth[:, i])
-
-        #I'm not sure what you're trying to do here but this isn't proper python syntax
-        #if you're trying to append onto coefficient you should do something like
-        #coefficient[whateverindex/indices] = whatyouwanttoappend
-        coefficient = [x, i]
+        # the issue here is that f and truth should be of size (M, N) and (M, K), respectively
+        x, res, rnk, s = scipy.linalg.lstsq(f[i, :], truth[:, i])
+        coefficient[:, i] = x
 
     # Part 3: EM pivot calibration using distortion correction
     emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
