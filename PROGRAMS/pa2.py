@@ -251,10 +251,10 @@ def main():
     for i in np.arange(0, N_B):
         F = icp.ICP(g, G[:, :, i], F0, eta0)
         R_i = F.get_rot()
-        p_i = F.get_vec()
+        p_i = np.array(F.get_vec())
         R_ptr[:, :, i] = R_i
         p_ptr[:, i] = p_i
-        B[i, :] = np.transpose(R_i * p_tip + p_i.reshape(3, 1))
+        B[i, :] = np.transpose((R_i*p_tip) + p_i)
 
     # Part 5: Compute F_reg
     ctFiducialsData, ctFiducialsSize = cartesian.readInput_CtFiducials(filename + '-ct-fiducials.txt')
