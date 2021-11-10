@@ -56,7 +56,7 @@ def distortionCorrection(p, q):
     upper = 1000
     lower = 0
 
-    mat = np.zeros(1, 3)
+    mat = np.zeros((1, 3))
     for i in np.arange(start=1, stop=3, step=1):
         mat[i] = ScaleToBox(p[i], lower, upper)
 
@@ -139,18 +139,18 @@ def main():
         p_A[:, i] = p_i
 
     # Compute C_i expected = inv(R_D) * (R_A*ci + p_A - p_D)
-    C_i = []
+    C_i = np.zeros((N_C, 3, N_framescal))
     for i in np.arange(0, N_framescal):
         for j in np.arange(0, N_C):
             C_i[j, :, i] = np.transpose(R_D[:, :, i].dot((R_A[:, :, i].dot(np.transpose(c[j, :]) + p_A[:, i] - p_D[:, i]))))
 
     # Part 2: Distortion Calibration
     # Create "ground truth" and EM measurements
-    truth = []
-    emMeasure = []
+    truth = np.zeros((3375, 3))
+    emMeasure = np.zeros((3375, 3))
     for i in np.arange(0, N_framescal):
-        truth = np.array([[truth], C_i[:, :, i]], dtype=object)
-        emMeasure = np.array([[emMeasure], C[:, :, i]], dtype=object)
+        truth = C_i.transpose().reshape(3375, 3)
+        emMeasure = C.transpose().reshape(3375, 3)
 
     qmax = 1000
     qmin = 0
@@ -165,9 +165,9 @@ def main():
 
     # Coefficient from distance using least squares
     coefficient = np.zeros((216, 3))
-    for i in np.arange(0, 2):
-        x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(f, truth[:, i])
-        coefficient = [x, i]
+    # for i in np.arange(0, 2):
+    #     x, resnorm, residual, exitflag, output, lambda_ = scipy.linalg.lstsq(f, truth[:, i])
+    #     coefficient = [x, i]
 
     # Part 3: EM pivot calibration using distortion correction
     emPivotData, emPivotSize = cartesian.readInput_EmPivot(filename + '-empivot.txt')
@@ -183,15 +183,15 @@ def main():
 
     # Use distortion correction
     G_correct = np.zeros((N_G, 3, N_framesEM))
-    for i in np.arange(0, N_framesEM):
-        for j in np.arange(0, N_G):
-            G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
+    # for i in np.arange(0, N_framesEM):
+    #     for j in np.arange(0, N_G):
+    #         G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
 
     # Define and use probe coordinate system to find g
     G2 = G_correct[:, :, 1]
     G_mid = np.mean(G2, 1)
 
-    g = np.zeros(N_G, 3)
+    g = np.zeros((N_G, 3))
     for i in np.arange(N_G, 3):
         g[i, :] = G2[i, :] - G_mid
 
