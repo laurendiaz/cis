@@ -23,18 +23,33 @@ given some pointer data frames, you will report corresponding CT coordinates.
 '''
 
 
-# Scales q
+
 def ScaleToBox(q, qmin, qmax):
+    """
+        Scales q
+    :param q:
+    :param qmin:
+    :param qmax:
+    :return:
+    """
     return (q - qmin) / (qmax - qmin)
 
 
-# Returns Bernstein basis polynomials
 def Bernie(a, b):
+    """
+        Returns Bernstein basis polynomials
+    :param a:
+    :param b:
+    """
     return scipy.special.comb(5, b) * (a ** b) * ((1 - a) ** (5 - b))
 
 
-# Returns "tensor forms" of interpolation polynomials
 def Tensor(v):
+    """
+        Returns "tensor forms" of interpolation polynomials
+    :param v:
+    :return f:
+    """
     rows = len(v)
     f = np.zeros((rows, 216))
     ind = 0
@@ -47,14 +62,14 @@ def Tensor(v):
 
 
 def distortionCorrection(p, q):
-    '''
+    """
         Compute distortion correction function for a distorted
         3D Navigational Sensor
         Construct a "tensor form" interpolation polynomial using 5th degree
         Bernstein polynomials F_ijk(u_x, u_y, u_z) = B_5,i(u_x)B_5,j(u_y)B_5,k(u_z)
         Given: - p = measurement to be corrected
                - q = coeff from dist calibration
-    '''
+    """
     # 1) determine bounding box to scale q_i values
     # pick upper and lower limits and compute u = ScaleToBox(qs,qmin,qmax)
     upper = 1000
@@ -166,7 +181,7 @@ def main():
     for i in np.arange(0, N_C * N_framescal):
         for j in np.arange(0, 2):
             v[i, j] = ScaleToBox(emMeasure[i, j], qmin, qmax)
-        f = np.array(Tensor(v[i, :]), dtype=float)
+        f[i, :] = np.transpose(np.array(Tensor(v[i, :]), dtype=object))
 
     # Coefficient from distance using least squares to be used in distortion coefficient
     coefficient = np.zeros((216, 3))
