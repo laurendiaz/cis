@@ -251,10 +251,11 @@ def main():
     for i in np.arange(0, N_B):
         F = icp.ICP(g, G[:, :, i], F0, eta0)
         R_i = F.get_rot()
-        p_i = np.array(F.get_vec())
+        p_i = F.get_vec()
         R_ptr[:, :, i] = R_i
         p_ptr[:, i] = p_i
-        B[i, :] = np.transpose((R_i*p_tip) + p_i)
+        p_i = np.reshape(p_i, (3, 1))
+        B[i, :] = np.transpose(np.dot(R_i, p_tip) + p_i)
 
     # Part 5: Compute F_reg
     ctFiducialsData, ctFiducialsSize = cartesian.readInput_CtFiducials(filename + '-ct-fiducials.txt')
@@ -281,21 +282,24 @@ def main():
             G_correct[j, :, i] = distortionCorrection(G[j, :, i], coefficient)
 
     # Compute pointer tip coordinates wrt tracker base
-
     R_ptr = np.zeros((3, 3, N_framesEM))
     p_ptr = np.zeros((3, N_framesEM))
     B = np.zeros((N_framesEM, 3))
     for i in np.arange(0, N_framesEM):
         F_ptr = icp.ICP(g, G_correct[:, :, i], F0, eta0)
-        R_ptr = F_ptr.get_rot()
-        p_ptr = F_ptr.get_vec()
-        B[i, :] = np.transpose(R_i * p_tip + p_i)
+        R_i = F.get_rot()
+        p_i = F.get_vec()
+        R_ptr[:, :, i] = R_i
+        p_ptr[:, i] = p_i
+        p_i = np.reshape(p_i, (3, 1))
+        B[i, :] = np.transpose(np.dot(R_i, p_tip) + p_i)
 
-    # Compute b_j of test points with respect to EM tracker base coordinates
+    # Compute b_j of test points with respect to CT coordinate system
     # and apply F_reg to find tip locations
-    b_j = np.zeros(N_framesEM, 3)
+    b_j = np.zeros((N_framesEM, 3))
+    p_reg = np.reshape(p_reg, (3,4))
     for i in np.arange(0, N_framesEM):
-        b_j[i, :] = np.transpose(R_reg * np.transpose(B[i, :]) + p_reg)
+        b_j[i, :] = np.transpose(np.dot(R_reg, np.transpose(B[i, :])) + p_reg)
 
     # Save and output results
     outname = filename + '-output2.txt'

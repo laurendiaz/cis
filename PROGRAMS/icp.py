@@ -145,6 +145,8 @@ def ICP(M, Q, F0, eta0):
             if k == 0:
                 # pick the distance to any point in the other cloud
                 M[0] = np.array(list(map(np.float, M[0])))
+                Q = Q.astype(np.float)
+                M = M.astype(np.float)
                 bnd = np.linalg.norm(Q[0] - M[0], 1)  # i think this is right? double check me
             else:
                 bnd = np.linalg.norm(C[k - 1] - cart.frameVecProd(F, Q[k - 1]), 1)
