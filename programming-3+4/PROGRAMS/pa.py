@@ -2,19 +2,63 @@ import os
 import numpy as np
 import cartesian
 from scipy.spatial.transform import Rotation as R
+import hyperspy as hs
 
 #implement matching - pa3
+
+def get_mesh():
+    sur_dict = hs.io_plugins.sur.file_reader('../INPUT/Problem3MeshFile.sur')
+    mesh_data = sur_dict.get("data")
+    num_verts = mesh_data[0]
+    verts_arr = np.transpose(np.reshape(mesh_data[2:num_verts*3+1], np.array(3, num_verts)))
+    num_tris = mesh_data(num_verts*3+2)
+    indices = np.reshape(mesh_data[num_verts*3+3:-1], np.array(6,num_tris))
+    indices = indices[:,1:3]
+    return verts_arr, indices, num_tris
+
 
 def readInput(name):
     fp = '../INPUT/' + name
     f = open(fp)
-    data = np.loadtxt(f, skiprows=1, dtype=str)
+    data = np.loadtxt(f, skiprows=1)
     n = np.loadtxt(f, max_rows = 1, dtype=str)
     size = 1 + n[0][0]
+    f.close()
     return size, data
 
+def ProjOnSeg(c, p, q):
+    l = np.dot(c - p, q - p) / dot(q - p, q - p)
+    if(l < 0):
+        l = 0
+    elif(l > 1):
+        l = 1
+    c = p + l *(q - p)
+    return c
 
-def ICP(A, B):
+
+def FindClosestNeighbor(a, triangle):
+    p = triangle[:,0]
+    q = triangle[:, 1]
+    r = triangle[:, 2]
+
+    ''' find params for interp using least squares '''
+    left = np.array(np.array(q - p, 1), np.array(r - p, 1))
+    right = np.array(a - p, 1)
+    l, m = np.linalg.lstsq(left, right)
+    c = p + l*(q - p) + m*(r - p)
+    c_curr = c
+
+    if(l + m > 1):
+        c = ProjOnSeg(c_curr, q, r)
+    elif(l < 0):
+        c = ProjOnSeg(c_curr, r, p)
+    elif (m < 0):
+        c = ProjOnSeg(c_curr, p, q)
+
+    dist = abs(c - a)
+    return c, dist
+
+def Reg(A, B):
     ''' find centroid '''
     a = np.mean(A, axis=0)
     b = np.mean(B, axis=0)
@@ -62,6 +106,7 @@ def ICP(A, B):
     return rot, pos
 
 def main():
+    ''' import data '''
     print('Enter the name of your input data file (e.g. PA3-A-Debug): ')
     filename = input()
     size_A, BAData = readInput('Problem3-BodyA.txt')
@@ -95,7 +140,7 @@ def main():
     rot_A = np.zeros(3,3,numSamples)
     pos_A = np.zeros(3,numSamples)
     for i in np.arange(0, numSamples):
-        rot, pos = ICP(body_A, read_A[:,:,i])
+        rot, pos = Reg(body_A, read_A[:,:,i])
         rot_A[:,:,i] = rot
         pos_A[:,i] = pos
     F_A = cartesian.Frame(rot_A, pos_A)
@@ -105,7 +150,7 @@ def main():
     rot_B = np.zeros(3,3,numSamples)
     pos_B = np.zeros(3,numSamples)
     for i in np.arange(0, numSamples):
-        rot, pos = ICP(body_B, read_B[:,:,i])
+        rot, pos = Reg(body_B, read_B[:,:,i])
         rot_B[:,:,i] = rot
         pos_B[:,i] = pos
     F_B = cartesian.Frame(rot_B, pos_B)
@@ -116,12 +161,28 @@ def main():
         d[i,:] = '''
     d = cartesian.frameVecProd(cartesian.frameProd(np.inv(F_B), F_A), tip_A)
     
-    '''output the CT coordinates ck corresponding
-        to each sample taken (ck = F dot dk) 
-        for now, assume F = I => d is our answer'''
+    # compute points s_k = F_reg dot d_k (F_reg = I)
+    # in this case, d_k = s_k
+
+    # find points c_k on surface mesh that are closest to s_k
+    verts_arr, indices, num_tris = get_mesh()
+    c = []
+    for j in numSamples:
+        for i in num_tris:
+            triangle = indices[i,:]
+            p = verts_arr[triangle[0] + 1, :]
+            q = verts_arr[triangle[1] + 1, :]
+            r = verts_arr[triangle[2] + 1, :]
+            c_j, dist = FindClosestNeighbor(np.transpose(d[j,:]), 
+                                            np.array(np.transpose(p), 
+                                                    np.transpose(q), 
+                                                    np.transpose(r)))
+            c[i] = c_j
+
+
 
     '''save and output results'''
-    out = str(output of CT coordinates)
+    out = str(c)
     outname = filename + '-Output.txt'
     os.makedirs('OUTPUT', mode=0o777, exist_ok=False)
     outpath = 'OUTPUT/' + outname
