@@ -3,31 +3,43 @@ import numpy as np
 import cartesian
 from scipy.spatial.transform import Rotation as R
 import hyperspy as hs
+import re
 
 #implement matching - pa3
 
 def get_mesh():
-    sur_dict = hs.io_plugins.sur.file_reader('../INPUT/Problem3MeshFile.sur')
-    mesh_data = sur_dict.get("data")
+    sur_dict = hs.io_plugins.sur.file_reader(os.getcwd() + '/INPUT/Problem3MeshFile.sur')
+    print(sur_dict)
+    mesh_data = sur_dict#.get("data")
     num_verts = mesh_data[0]
     verts_arr = np.transpose(np.reshape(mesh_data[2:num_verts*3+1], np.array(3, num_verts)))
-    num_tris = mesh_data(num_verts*3+2)
+    num_tris = mesh_data[num_verts*3+2]
     indices = np.reshape(mesh_data[num_verts*3+3:-1], np.array(6,num_tris))
     indices = indices[:,1:3]
     return verts_arr, indices, num_tris
 
 
 def readInput(name):
-    fp = '../INPUT/' + name
+    fp = os.getcwd() + '/INPUT/' + name
     f = open(fp)
-    data = np.loadtxt(f, skiprows=1)
     n = np.loadtxt(f, max_rows = 1, dtype=str)
-    size = 1 + n[0][0]
+    data = np.loadtxt(f, dtype=float)
+    size = 1 + int(n[0])
     f.close()
     return size, data
 
+def readInputSampleReadings(name):
+    fp = os.getcwd() + '/INPUT/' + name
+    f = open(fp)
+    n = np.loadtxt(f, max_rows = 1, dtype=str, delimiter=',')
+    data = np.loadtxt(f, dtype=str, delimiter=',')
+    numLEDSInFrame = int(n[0])
+    numSampleFrames = int(n[1])
+    f.close()
+    return numLEDSInFrame, numSampleFrames, data
+
 def ProjOnSeg(c, p, q):
-    l = np.dot(c - p, q - p) / dot(q - p, q - p)
+    l = np.dot(c - p, q - p) / np.dot(q - p, q - p)
     if(l < 0):
         l = 0
     elif(l > 1):
@@ -72,23 +84,24 @@ def Reg(A, B):
 
     ''' solve for R '''
     # compute H
-    H = np.zeros(3)
+    H = np.zeros((3, 3))
+    print(H)
     for i in np.arange(0, A.shape[0]):
         a_curr = dist_a[i,:]
         b_curr = dist_b[i,:]
-        h_curr = np.array(np.array(
-            a_curr[0] * b_curr[0], a_curr[0] * b_curr[1], a_curr[0] * b_curr[2]
+        h_curr = np.array([np.array(
+            [a_curr[0] * b_curr[0], a_curr[0] * b_curr[1], a_curr[0] * b_curr[2]]
         ), np.array(
-            a_curr[1] * b_curr[0], a_curr[1] * b_curr[1], a_curr[1] * b_curr[2]
+            [a_curr[1] * b_curr[0], a_curr[1] * b_curr[1], a_curr[1] * b_curr[2]]
         ), np.array(
-            a_curr[2] * b_curr[0], a_curr[2] * b_curr[1], a_curr[2] * b_curr[2]
-        ))
-        H = np.concatenate(H, h_curr)
+            [a_curr[2] * b_curr[0], a_curr[2] * b_curr[1], a_curr[2] * b_curr[2]]
+        )])
+        np.add(H, h_curr)
 
     # compute G
-    delta = np.array(H[1,2] - H[2,1], 
+    delta = np.array([H[1,2] - H[2,1], 
                 H[2,0] - H[0,2],
-                H[0,1] - H[1,0])
+                H[0,1] - H[1,0]])
     g = np.array(np.concatenate(np.trace(H), np.transpose(delta)),
         np.concatenate(delta, H + np.transpose(H) - np.trace(H) * np.eye(3)))
     
@@ -112,33 +125,31 @@ def main():
     size_A, BAData = readInput('Problem3-BodyA.txt')
     size_B, BBData = readInput('Problem3-BodyB.txt')
 
-    readingSize, readingData = readInput(filename + '-SampleReadingsTest.txt')
+    size_S, numSamples, readingData = readInputSampleReadings(filename + '-SampleReadingsTest.txt')
 
-    size_S = readingSize[0]
     size_D = size_S - size_A - size_B
-    numSamples = readingSize[1]
 
     body_A = BAData[1:size_A,:] # marker pos wrt ba coords
     body_B = BBData[1:size_B,:] # marker pos wrt bb coords
 
-    tip_A = BAData[size_A + 1,:] # tip a pos wrt ba coords
-    tip_B = BBData[size_B + 1,:] # tip b pos wrt bb coords
+    tip_A = BAData[size_A - 1,:] # tip a pos wrt ba coords
+    tip_B = BBData[size_B - 1,:] # tip b pos wrt bb coords
 
     ''' marker pos wrt tracker '''
-    read_A = np.zeros(size_A, 3, numSamples)
-    read_B = np.zeros(size_B, 3, numSamples)
+    read_A = np.zeros((size_A, 3, numSamples))
+    read_B = np.zeros((size_B, 3, numSamples))
 
     count = 0
     for i in np.arange(0, numSamples):
-        read_A[:,:,i] = readingData[count:count + size_A - 1,:]
+        read_A[:,:,i] = readingData[count:count + size_A,:]
         count += size_A
-        read_B[:,:,i] = readingData[count:count + size_B - 1,:]
+        read_B[:,:,i] = readingData[count:count + size_B,:]
         count += size_B + size_D
         
     
     ''' compute frame A '''
-    rot_A = np.zeros(3,3,numSamples)
-    pos_A = np.zeros(3,numSamples)
+    rot_A = np.zeros((3,3,numSamples))
+    pos_A = np.zeros((3,numSamples))
     for i in np.arange(0, numSamples):
         rot, pos = Reg(body_A, read_A[:,:,i])
         rot_A[:,:,i] = rot
@@ -147,8 +158,8 @@ def main():
 
 
     ''' compute frame B '''
-    rot_B = np.zeros(3,3,numSamples)
-    pos_B = np.zeros(3,numSamples)
+    rot_B = np.zeros((3,3,numSamples))
+    pos_B = np.zeros((3,numSamples))
     for i in np.arange(0, numSamples):
         rot, pos = Reg(body_B, read_B[:,:,i])
         rot_B[:,:,i] = rot
@@ -167,8 +178,9 @@ def main():
     # find points c_k on surface mesh that are closest to s_k
     verts_arr, indices, num_tris = get_mesh()
     c = []
-    for j in numSamples:
-        for i in num_tris:
+    distances = []
+    for j in np.arange(0, numSamples):
+        for i in np.arange(0, num_tris):
             triangle = indices[i,:]
             p = verts_arr[triangle[0] + 1, :]
             q = verts_arr[triangle[1] + 1, :]
@@ -177,19 +189,20 @@ def main():
                                             np.array(np.transpose(p), 
                                                     np.transpose(q), 
                                                     np.transpose(r)))
-            c[i] = c_j
+            c[j] = c_j
+            distances[j] = dist
 
 
 
     '''save and output results'''
-    out = str(c)
+    
     outname = filename + '-Output.txt'
     os.makedirs('OUTPUT', mode=0o777, exist_ok=False)
     outpath = 'OUTPUT/' + outname
     fileID = open(outpath, 'w+')
     fileID.write('%d, %s\n' % (numSamples, outname))
-    fileID.write(out) # This should be whatever the output is 'output = [A, B, norm of distances]
-                      # should be 15x7 or 20x7
+    for i in np.arange(0, numSamples):
+        fileID.write('%f %f %f %f %f %f %f %f\n', d[i][0], d[i][1], d[i][2], c[i][0], c[i][1], c[i][2], distances[i])
     fileID.close()
 
     return 0
