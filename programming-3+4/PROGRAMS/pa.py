@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import cartesian
 from scipy.spatial.transform import Rotation as R
@@ -61,7 +62,7 @@ def ICP(A, B):
     return rot, pos
 
 def main():
-    print('Enter the name of your input data file (e.g. pa3-a-debug): ')
+    print('Enter the name of your input data file (e.g. PA3-A-Debug): ')
     filename = input()
     size_A, BAData = readInput('Problem3-BodyA.txt')
     size_B, BBData = readInput('Problem3-BodyB.txt')
@@ -118,6 +119,18 @@ def main():
     '''output the CT coordinates ck corresponding
         to each sample taken (ck = F dot dk) 
         for now, assume F = I => d is our answer'''
+
+    '''save and output results'''
+    out = str(output of CT coordinates)
+    outname = filename + '-Output.txt'
+    os.makedirs('OUTPUT', mode=0o777, exist_ok=False)
+    outpath = 'OUTPUT/' + outname
+    fileID = open(outpath, 'w+')
+    fileID.write('%d, %s\n' % (numSamples, outname))
+    fileID.write(out) # This should be whatever the output is 'output = [A, B, norm of distances]
+                      # should be 15x7 or 20x7
+    fileID.close()
+
     return 0
 
 main()
