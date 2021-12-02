@@ -9,7 +9,7 @@ import re
 # implement matching - pa3
 
 def get_mesh():
-    sur_dict = hs.io_plugins.sur.file_reader(os.getcwd() + '/INPUT/Problem3MeshFile.sur')
+    sur_dict = hs.io_plugins.sur.file_reader(os.getcwd() + '/INPUT/Problem4MeshFile.sur')
     print(sur_dict)
     mesh_data = sur_dict  # .get("data")
     num_verts = mesh_data[0]
@@ -195,16 +195,16 @@ def main():
             c[j] = c_j
             distances[j] = dist
 
-    '''save and output results'''
-
-    outname = filename + '-Output.txt'
-    os.makedirs('OUTPUT', mode=0o777, exist_ok=False)
-    outpath = 'OUTPUT/' + outname
-    fileID = open(outpath, 'w+')
-    fileID.write('%d, %s\n' % (numSamples, outname))
-    for i in np.arange(0, numSamples):
-        fileID.write('%f %f %f %f %f %f %f %f\n', d[i][0], d[i][1], d[i][2], c[i][0], c[i][1], c[i][2], distances[i])
-    fileID.close()
+    # '''save and output results'''
+    #
+    # outname = filename + '-Output.txt'
+    # os.makedirs('OUTPUT', mode=0o777, exist_ok=False)
+    # outpath = 'OUTPUT/' + outname
+    # fileID = open(outpath, 'w+')
+    # fileID.write('%d, %s\n' % (numSamples, outname))
+    # for i in np.arange(0, numSamples):
+    #     fileID.write('%f %f %f %f %f %f %f %f\n', d[i][0], d[i][1], d[i][2], c[i][0], c[i][1], c[i][2], distances[i])
+    # fileID.close()
 
     return 0
 
