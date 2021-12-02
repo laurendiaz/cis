@@ -125,7 +125,7 @@ def Reg(A, B):
 
 def main():
     ''' import data '''
-    print('Enter the name of your input data file (e.g. PA3-A-Debug): ')
+    print('Enter the name of your input data file (e.g. PA4-A-Debug): ')
     filename = input()
     size_A, BAData = readInput('Problem3-BodyA.txt')
     size_B, BBData = readInput('Problem3-BodyB.txt')
@@ -194,6 +194,8 @@ def main():
                                                      np.transpose(r)))
             c[j] = c_j
             distances[j] = dist
+
+    '''Implement ICP'''
 
     # '''save and output results'''
     #
