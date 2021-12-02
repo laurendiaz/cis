@@ -220,8 +220,8 @@ def main():
     # Pivot calibration using distortion correction
     # print(g)
     # print(G_correct)
-    # p_tip, p_dimple, R, p = pivotCalibration.pivotCalibration(g, G_correct)
-    p_tip = np.zeros((3, 1))
+    p_tip, p_dimple, R, p = pivotCalibration.pivotCalibration(g, G_correct)
+    # p_tip = np.zeros((3, 1))
 
     # Part 4: Using the distortion correction and the improved pivot value, compute b_j, the locations of the
     # fiducials points with respect to the EM tracker base coordinate system
