@@ -68,12 +68,8 @@ def ICP(numSamples, d, filename):
                 upper_y = np.max(np.array([p[0], q[0], r[0]]))
                 upper_z = np.max(np.array([p[0], q[0], r[0]]))
 
-                if (lower_x - dist <= s[0] and
-                        s[0] <= upper_x + dist and
-                        lower_y - dist <= s[1] and
-                        s[1] <= upper_y + dist and
-                        lower_z - dist <= s[2] and
-                        s[2] <= upper_z + dist):
+                if (lower_x - dist <= s[0] <= upper_x + dist <= s[1] <= upper_y + dist and
+                        lower_z - dist <= s[2] <= upper_z + dist):
                     hi, disti = pa.FindClosestNeighbor(np.transpose(s),
                                                        np.array(np.transpose(p), np.transpose(q), np.transpose(r)))
                     if np.linalg.norm(disti) < dist:

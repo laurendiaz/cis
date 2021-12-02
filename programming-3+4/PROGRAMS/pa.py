@@ -105,10 +105,14 @@ def Reg(A, B):
     delta = np.array([H[1, 2] - H[2, 1],
                       H[2, 0] - H[0, 2],
                       H[0, 1] - H[1, 0]])
-    g = np.array(np.concatenate(np.trace(H), np.transpose(delta)),
-                 np.concatenate(delta, H + np.transpose(H) - np.trace(H) * np.eye(3)))
+    test = (np.trace(H)).shape
+    test1 = delta.shape
+    test11 = np.transpose(delta).shape
+    test2 = (H + np.transpose(H) - np.trace(H) * np.eye(3)).shape
+    g = np.array(np.concatenate([np.trace(H), np.transpose(delta)]),
+                 np.concatenate((delta, H + np.transpose(H) - np.trace(H) * np.eye(3))))
 
-    # perform eigenvalue decomp
+    # perform eigenvalue decomposition
     v, d = np.linalg.eig(g)
     dummy, max_i = np.max(np.array(
         d[0, 0], d[1, 1], d[2, 2], d[3, 3]
