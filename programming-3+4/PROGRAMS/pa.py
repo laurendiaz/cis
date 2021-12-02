@@ -3,7 +3,6 @@ import numpy as np
 import cartesian
 from scipy.spatial.transform import Rotation as R
 import hyperspy as hs
-import re
 
 #implement matching - pa3
 
