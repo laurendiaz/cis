@@ -106,15 +106,10 @@ def Reg(A, B):
     delta = np.array([H[1, 2] - H[2, 1],
                       H[2, 0] - H[0, 2],
                       H[0, 1] - H[1, 0]])
-    delta = np.reshape(delta, (1, 3))
-    diag_H = np.diag(H)
-    diag_H = np.reshape(diag_H, (3, 1))
-    # test = (np.hstack((diag_H, np.transpose(delta)))).shape
-    # test1 = (np.hstack((np.transpose(delta), H + np.transpose(H) - np.diag(H) * np.eye(3)))).shape
-    # test2 = (np.transpose(delta)).shape
-    # test3 = (H + np.transpose(H) - np.diag(H) * np.eye(3)).shape
-    g = np.array([np.hstack((diag_H, np.transpose(delta)))],
-                 [np.hstack((np.transpose(delta), H + np.transpose(H) - np.diag(H) * np.eye(3)))])
+    delta = np.reshape(delta, (3, 1))
+    test = np.trace(H)
+    g = np.vstack((np.append((np.trace(H), np.transpose(delta))),
+                   np.append((delta, H + np.transpose(H) - np.trace(H) * np.eye(3)))))
 
     # perform eigenvalue decomposition
     v, d = np.linalg.eig(g)
