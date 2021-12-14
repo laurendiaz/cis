@@ -1,4 +1,3 @@
-import pa
 import numpy as np
 import cartesian
 import math
@@ -8,12 +7,12 @@ from ICP_Reg_util import *
 
 def main():
     ''' import data '''
-    print('Enter the name of your input data file (e.g. PA4-A-Debug): ')
+    print('Enter the name of your input data file (e.g. PA5-A-Debug): ')
     filename = input()
-    size_A, BAData = pa.readInput('Problem4-BodyA.txt')
-    size_B, BBData = pa.readInput('Problem4-BodyB.txt')
+    size_A, BAData = readInput('Problem5-BodyA.txt')
+    size_B, BBData = readInput('Problem5-BodyB.txt')
 
-    size_S, numSamples, readingData = pa.readInputSampleReadings(filename + '-SampleReadingsTest.txt')
+    size_S, numSamples, readingData = readInputSampleReadings(filename + '-SampleReadingsTest.txt')
 
     size_D = size_S - size_A - size_B
 
@@ -38,7 +37,7 @@ def main():
     rot_A = np.zeros((3, 3, numSamples))
     pos_A = np.zeros((3, numSamples))
     for i in np.arange(0, numSamples):
-        rot, pos = pa.Reg(body_A, read_A[:, :, i])
+        rot, pos = Reg(body_A, read_A[:, :, i])
         rot_A[:, :, i] = rot
         pos_A[:, i] = pos
     F_A = cartesian.Frame(rot_A, pos_A)
@@ -47,19 +46,16 @@ def main():
     rot_B = np.zeros((3, 3, numSamples))
     pos_B = np.zeros((3, numSamples))
     for i in np.arange(0, numSamples):
-        rot, pos = pa.Reg(body_B, read_B[:, :, i])
+        rot, pos = Reg(body_B, read_B[:, :, i])
         rot_B[:, :, i] = rot
         pos_B[:, i] = pos
     F_B = cartesian.Frame(rot_B, pos_B)
 
     ''' compute dk '''
-    '''d = np.zeros(numSamples, 3)
-    for i in numSamples:
-        d[i,:] = '''
     d = cartesian.frameVecProd(cartesian.frameProd(np.inv(F_B), F_A), tip_A)
 
     # find points c_k on surface mesh that are closest to s_k
-    verts_arr, indices, num_tris = pa.get_mesh()
+    verts_arr, indices, num_tris = get_mesh()
     c = []
     distances = []
     for j in np.arange(0, numSamples):
@@ -68,14 +64,22 @@ def main():
             p = verts_arr[triangle[0] + 1, :]
             q = verts_arr[triangle[1] + 1, :]
             r = verts_arr[triangle[2] + 1, :]
-            c_j, dist = pa.FindClosestNeighbor(np.transpose(d[j, :]),
+            c_j, dist = FindClosestNeighbor(np.transpose(d[j, :]),
                                                np.array(np.transpose(p),
                                                         np.transpose(q),
                                                         np.transpose(r)))
             c[j] = c_j
             distances[j] = dist
+    converge = False
+    while(not converge):
+        ''' for sample points, find closest matches to current mesh (pa4)'''
+        R_fin, p_fin = ICP(numSamples, d)
 
-    ICP(numSamples, d, filename)
+        ''' solve F dot d_k ~ q_0,k + sum(lambda_m^t q_m,k) '''
+        # (solve for F and/or lambda)
+
+        ''' If change the shape parameters then update bounding boxes '''
+
 
 
 main()

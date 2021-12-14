@@ -123,11 +123,9 @@ def Reg(A, B):
     delta = np.reshape(delta, (3, 1))
     test = np.trace(H)
     # this doesn't work
-    '''
     g = np.vstack((np.append((np.trace(H), np.transpose(delta))),
                    np.append((delta, H + np.transpose(H) - np.trace(H) * np.eye(3)))))
-                   '''
-    g = 0
+                   
 
     # perform eigenvalue decomposition
     v, d = np.linalg.eig(g)
